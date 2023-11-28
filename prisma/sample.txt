@@ -1,0 +1,925 @@
+// src/database/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Define your models
+model User {
+  id       Int      @id @default(autoincrement())
+  username String
+  email    String   @unique
+  // Add other user fields as needed
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  // Add other product fields as needed
+
+  // Define relationships
+  vendorId    Int
+  vendor      User     @relation(fields: [vendorId], references: [id])
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String
+  // Add other category fields as needed
+
+  // Define relationships
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         Int      @id @default(autoincrement())
+  name       String
+  categoryId Int
+  // Add other subcategory fields as needed
+
+  // Define relationships
+  category     Category @relation(fields: [categoryId], references: [id])
+  products     Product[]
+}
+
+model Size {
+  id       Int      @id @default(autoincrement())
+  name     String
+  // Add other size fields as needed
+}
+
+
+model ProductSize {
+  productId Int
+  sizeId    Int
+  // Add other fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  size    Size    @relation(fields: [sizeId], references: [id])
+}
+
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String
+  email        String   @unique
+  passwordHash String
+  // Add other user fields as needed
+
+  // Define relationships
+  vendorDetails VendorDetails?
+  products      Product[]
+}
+
+model VendorDetails {
+  id             Int     @id @default(autoincrement())
+  vendorId       Int
+  businessName   String
+  contactNumber  String
+  // Add other vendor details fields as needed
+
+  // Define relationships
+  vendor User @relation(fields: [vendorId], references: [id])
+}
+
+model Product {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String
+  price            Float
+  stockQuantity    Int
+  averageRating    Float
+  totalReviews     Int
+  publishedAt      DateTime @default(now())
+  // Add other product fields as needed
+
+  // Define relationships
+  vendorId         Int
+  vendor           User     @relation(fields: [vendorId], references: [id])
+  categories       Category[]
+  subcategories    Subcategory[]
+  productSizes     ProductSize[]
+  productImages    ProductImage[]
+  productReviews   ProductReview[]
+  productOrders    ProductOrder[]
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String
+  // Add other category fields as needed
+
+  // Define relationships
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         Int      @id @default(autoincrement())
+  name       String
+  categoryId Int
+  // Add other subcategory fields as needed
+
+  // Define relationships
+  category     Category @relation(fields: [categoryId], references: [id])
+  products     Product[]
+}
+
+model Size {
+  id       Int      @id @default(autoincrement())
+  name     String
+  // Add other size fields as needed
+}
+
+model ProductSize {
+  id       Int      @id @default(autoincrement())
+  productId Int
+  sizeId    Int
+  quantity Int
+  // Add other fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  size    Size    @relation(fields: [sizeId], references: [id])
+}
+
+model ProductImage {
+  id       Int      @id @default(autoincrement())
+  productId Int
+  imageUrl String
+  // Add other fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ProductReview {
+  id         Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Float
+  comment   String?
+  // Add other review fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model ProductOrder {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  userId     Int
+  quantity   Int
+  totalPrice Float
+  status     String   // Enum: "Pending", "Processing", "Shipped", "Delivered"
+  // Add other order fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+// More models and relationships can be added based on your requirements
+// src/database/schema.prisma
+
+model Cart {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int
+  quantity   Int
+  // Add other cart fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Wishlist {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int
+  // Add other wishlist fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  street    String
+  city      String
+  state     String
+  country   String
+  zipCode   String
+  isDefault Boolean @default(false)
+  // Add other address fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model PaymentMethod {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  type      String
+  cardNumber String
+  expirationDate String
+  // Add other payment method fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  totalPrice      Float
+  status          String   // Enum: "Pending", "Processing", "Shipped", "Delivered"
+  paymentMethodId Int
+  addressId       Int
+  // Add other order fields as needed
+
+  // Define relationships
+  user          User           @relation(fields: [userId], references: [id])
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  address       Address        @relation(fields: [addressId], references: [id])
+  products      ProductOrder[]
+}
+
+// Additional models can be added based on your requirements
+
+// src/database/schema.prisma
+
+model Promotion {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String
+  discount      Float
+  startDate     DateTime
+  endDate       DateTime
+  // Add other promotion fields as needed
+}
+
+model VendorRating {
+  id         Int      @id @default(autoincrement())
+  vendorId   Int
+  userId    Int
+  rating     Float
+  comment    String?
+  // Add other vendor rating fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model VendorOrder {
+  id         Int      @id @default(autoincrement())
+  vendorId   Int
+  orderId    Int
+  status     String   // Enum: "Pending", "Processing", "Shipped", "Delivered"
+  // Add other vendor order fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  order  Order  @relation(fields: [orderId], references: [id])
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  content     String
+  isRead      Boolean  @default(false)
+  // Add other notification fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Chat {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  vendorId   Int
+  message    String
+  timestamp  DateTime
+  // Add other chat fields as needed
+
+  // Define relationships
+  user   User   @relation(fields: [userId], references: [id])
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ReturnRequest {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  userId      Int
+  status      String   // Enum: "Pending", "Approved", "Rejected"
+  reason      String
+  createdAt   DateTime @default(now())
+  // Add other return request fields as needed
+
+  // Define relationships
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model Refund {
+  id           Int      @id @default(autoincrement())
+  returnId     Int
+  amount       Float
+  status       String   // Enum: "Pending", "Processed"
+  processedAt  DateTime?
+  // Add other refund fields as needed
+
+  // Define relationships
+  return ReturnRequest @relation(fields: [returnId], references: [id])
+}
+
+model Advertisement {
+  id          Int      @id @default(autoincrement())
+  vendorId    Int
+  imageUrl    String
+  startDate   DateTime
+  endDate     DateTime
+  // Add other advertisement fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+}
+
+model CategoryAdvertisement {
+  id            Int      @id @default(autoincrement())
+  categoryId    Int
+  imageUrl      String
+  startDate     DateTime
+  endDate       DateTime
+  // Add other category advertisement fields as needed
+
+  // Define relationships
+  category Category @relation(fields: [categoryId], references: [id])
+}
+
+model FeaturedProduct {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  startDate     DateTime
+  endDate       DateTime
+  // Add other featured product fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ProductQuestion {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  userId        Int
+  question      String
+  answer        String?
+  isAnswered    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  // Add other product question fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model ProductReport {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  userId        Int
+  reason        String
+  status        String   // Enum: "Pending", "Reviewed"
+  // Add other product report fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model VendorReport {
+  id            Int      @id @default(autoincrement())
+  vendorId      Int
+  userId        Int
+  reason        String
+  status        String   // Enum: "Pending", "Reviewed"
+  // Add other vendor report fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model NotificationSetting {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  email         Boolean
+  push          Boolean
+  // Add other notification settings as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ExchangeRequest {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  userId        Int
+  status        String   // Enum: "Pending", "Approved", "Rejected"
+  reason        String
+  createdAt     DateTime @default(now())
+  // Add other exchange request fields as needed
+
+  // Define relationships
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model Exchange {
+  id           Int      @id @default(autoincrement())
+  exchangeId   Int
+  productId    Int
+  newProductId Int
+  status       String   // Enum: "Pending", "Processed"
+  // Add other exchange fields as needed
+
+  // Define relationships
+  exchangeRequest ExchangeRequest @relation(fields: [exchangeId], references: [id])
+  product         Product         @relation(fields: [productId], references: [id])
+  newProduct      Product         @relation(fields: [newProductId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ProductComparison {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId1 Int
+  productId2 Int
+  // Add other product comparison fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+  product1 Product @relation(fields: [productId1], references: [id])
+  product2 Product @relation(fields: [productId2], references: [id])
+}
+
+model ProductRating {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  userId    Int
+  rating     Float
+  comment    String?
+  // Add other product rating fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model ProductTag {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  tag       String
+  // Add other product tag fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model VendorTag {
+  id        Int      @id @default(autoincrement())
+  vendorId  Int
+  tag       String
+  // Add other vendor tag fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+}
+
+model ProductView {
+  id         Int      @id @default(autoincrement())
+  userId    Int
+  productId  Int
+  timestamp  DateTime
+  // Add other product view fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+// src/database/schema.prisma
+
+model UserActivity {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String
+  timestamp  DateTime
+  // Add other user activity fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model ProductVariant {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  variantName String
+  price       Float
+  stock       Int
+  // Add other product variant fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model ProductVariantOrder {
+  id               Int      @id @default(autoincrement())
+  variantId        Int
+  orderId          Int
+  quantity         Int
+  totalPrice       Float
+  // Add other product variant order fields as needed
+
+  // Define relationships
+  productVariant ProductVariant @relation(fields: [variantId], references: [id])
+  order          Order          @relation(fields: [orderId], references: [id])
+}
+
+model ProductVariantReview {
+  id         Int      @id @default(autoincrement())
+  variantId  Int
+  userId    Int
+  rating     Float
+  comment    String?
+  // Add other product variant review fields as needed
+
+  // Define relationships
+  productVariant ProductVariant @relation(fields: [variantId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model UserPreference {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  theme      String   // Enum: "Light", "Dark"
+  language   String
+  // Add other user preference fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  plan       String   // Enum: "Basic", "Pro", "Premium"
+  status     String   // Enum: "Active", "Canceled"
+  startDate  DateTime
+  endDate    DateTime
+  // Add other subscription fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SubscriptionPayment {
+  id               Int      @id @default(autoincrement())
+  subscriptionId  Int
+  amount          Float
+  paymentMethod   String   // Enum: "Credit Card", "PayPal", etc.
+  transactionDate DateTime
+  // Add other subscription payment fields as needed
+
+  // Define relationships
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model OrderReturn {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  userId     Int
+  status     String   // Enum: "Pending", "Approved", "Rejected"
+  reason     String
+  createdAt  DateTime @default(now())
+  // Add other order return fields as needed
+
+  // Define relationships
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model OrderRefund {
+  id          Int      @id @default(autoincrement())
+  returnId    Int
+  amount      Float
+  status      String   // Enum: "Pending", "Processed"
+  processedAt DateTime?
+  // Add other order refund fields as needed
+
+  // Define relationships
+  return OrderReturn @relation(fields: [returnId], references: [id])
+}
+
+model NotificationTemplate {
+  id      Int    @id @default(autoincrement())
+  name    String
+  subject String
+  body    String
+  // Add other notification template fields as needed
+}
+
+model Discount {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  value      Float
+  startDate  DateTime
+  endDate    DateTime
+  // Add other discount fields as needed
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int
+  quantity   Int
+  // Add other cart item fields as needed
+
+  // Define relationships
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ProductHighlight {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  title       String
+  description String
+  imageUrl    String
+  // Add other product highlight fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model AdvertisementClick {
+  id              Int      @id @default(autoincrement())
+  advertisementId Int
+  userId          Int
+  timestamp       DateTime
+  // Add other advertisement click fields as needed
+
+  // Define relationships
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+}
+
+model WishlistProduct {
+  id         Int      @id @default(autoincrement())
+  wishlistId Int
+  productId  Int
+  // Add other wishlist product fields as needed
+
+  // Define relationships
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+}
+
+model ReviewHelpfulVote {
+  id         Int      @id @default(autoincrement())
+  reviewId   Int
+  userId    Int
+  // Add other review helpful vote fields as needed
+
+  // Define relationships
+  review ProductReview @relation(fields: [reviewId], references: [id])
+  user  User          @relation(fields: [userId], references: [id])
+}
+
+model ProductTagVote {
+  id         Int      @id @default(autoincrement())
+  tagId      Int
+  userId    Int
+  // Add other product tag vote fields as needed
+
+  // Define relationships
+  tag  ProductTag @relation(fields: [tagId], references: [id])
+  user User      @relation(fields: [userId], references: [id])
+}
+
+// src/database/schema.prisma
+
+model ProductSale {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  discount      Float
+  startDate     DateTime
+  endDate       DateTime
+  // Add other product sale fields as needed
+
+  // Define relationships
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model OrderPromotion {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  promotionId   Int
+  discount      Float
+  // Add other order promotion fields as needed
+
+  // Define relationships
+  order Order      @relation(fields: [orderId], references: [id])
+  promotion Promotion @relation(fields: [promotionId], references: [id])
+}
+
+model UserVerification {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  token         String
+  expiresAt     DateTime
+  isVerified    Boolean  @default(false)
+  // Add other user verification fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+}
+
+model VendorVerification {
+  id            Int      @id @default(autoincrement())
+  vendorId      Int
+  token         String
+  expiresAt     DateTime
+  isVerified    Boolean  @default(false)
+  // Add other vendor verification fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+}
+
+model UserReport {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  reportedUserId Int
+  reason     String
+  status     String   // Enum: "Pending", "Reviewed"
+  // Add other user report fields as needed
+
+  // Define relationships
+  user User @relation(fields: [userId], references: [id])
+  reportedUser User @relation(fields: [reportedUserId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model VendorReview {
+  id         Int      @id @default(autoincrement())
+  vendorId   Int
+  userId    Int
+  rating     Float
+  comment    String?
+  // Add other vendor review fields as needed
+
+  // Define relationships
+  vendor Vendor @relation(fields: [vendorId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model ProductReportVote {
+  id            Int      @id @default(autoincrement())
+  reportId      Int
+  userId        Int
+  // Add other product report vote fields as needed
+
+  // Define relationships
+  report ProductReport @relation(fields: [reportId], references: [id])
+  user   User          @relation(fields: [userId], references: [id])
+}
+
+model VendorReportVote {
+  id            Int      @id @default(autoincrement())
+  reportId      Int
+  userId        Int
+  // Add other vendor report vote fields as needed
+
+  // Define relationships
+  report VendorReport @relation(fields: [reportId], references: [id])
+  user   User          @relation(fields: [userId], references: [id])
+}
+
+model OrderReturnComment {
+  id         Int      @id @default(autoincrement())
+  returnId   Int
+  userId    Int
+  comment    String
+  // Add other order return comment fields as needed
+
+  // Define relationships
+  return OrderReturn @relation(fields: [returnId], references: [id])
+  user   User        @relation(fields: [userId], references: [id])
+}
+
+model ExchangeRequestComment {
+  id         Int      @id @default(autoincrement())
+  exchangeRequestId   Int
+  userId    Int
+  comment    String
+  // Add other exchange request comment fields as needed
+
+  // Define relationships
+  exchangeRequest ExchangeRequest @relation(fields: [exchangeRequestId], references: [id])
+  user   User        @relation(fields: [userId], references: [id])
+}
+
+
+// src/database/schema.prisma
+
+model ProductComparisonVote {
+  id               Int      @id @default(autoincrement())
+  comparisonId     Int
+  userId           Int
+  preferredProduct Int
+  // Add other product comparison vote fields as needed
+
+  // Define relationships
+  comparison ProductComparison @relation(fields: [comparisonId], references: [id])
+  user       User             @relation(fields: [userId], references: [id])
+}
+
+model AdvertisementView {
+  id               Int      @id @default(autoincrement())
+  advertisementId  Int
+  userId           Int
+  timestamp        DateTime
+  // Add other advertisement view fields as needed
+
+  // Define relationships
+  advertisement Advertisement @relation(fields: [advertisementId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+}
+
+model ProductTagComment {
+  id         Int      @id @default(autoincrement())
+  tagId      Int
+  userId    Int
+  comment    String
+  // Add other product tag comment fields as needed
+
+  // Define relationships
+  tag  ProductTag @relation(fields: [tagId], references: [id])
+  user User      @relation(fields: [userId], references: [id])
+}
+
+model VendorTagComment {
+  id         Int      @id @default(autoincrement())
+  tagId      Int
+  userId    Int
+  comment    String
+  // Add other vendor tag comment fields as needed
+
+  // Define relationships
+  tag  VendorTag @relation(fields: [tagId], references: [id])
+  user User      @relation(fields: [userId], references: [id])
+}
+
+model SubscriptionUsage {
+  id             Int      @id @default(autoincrement())
+  subscriptionId Int
+  used           Float
+  // Add other subscription usage fields as needed
+
+  // Define relationships
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+
+
+
