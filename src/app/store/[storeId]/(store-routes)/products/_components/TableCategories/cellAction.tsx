@@ -70,7 +70,10 @@ interface CellActionProps {
       setLoading(false);
     }
   };
-
+  const onCopy = (id: string) => {
+    navigator.clipboard.writeText(id);
+    toast({description: 'Product ID copied to clipboard.'});
+  }
   return (
     <>
             <FormattedAlertModal title = "Are you absolutely sure?"  description ="This action cannot be undone. This will permanently delete your account and remove your data from our servers." isOpen = {open}  onClose={() => setOpen(false)} />
@@ -83,7 +86,11 @@ interface CellActionProps {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  
+          <DropdownMenuItem
+            onClick={() => onCopy(data.id)}
+          >
+            <Copy className="mr-2 h-4 w-4" /> Copy Id
+          </DropdownMenuItem>     
           <DropdownMenuItem
             onClick={() => router.push(`/store/${params.storeId}/products/${data.id}`)}
           >

@@ -67,6 +67,10 @@ interface CellActionProps {
       setLoading(false);
     }
   };
+  const onCopy = (id: string) => {
+    navigator.clipboard.writeText(id);
+    toast({description: 'Billboard ID copied to clipboard.'});
+  }
 
   return (
     <>
@@ -89,6 +93,11 @@ interface CellActionProps {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+        <DropdownMenuItem
+            onClick={() => onCopy(data.id)}
+          >
+            <Copy className="mr-2 h-4 w-4" /> Copy Id
+          </DropdownMenuItem>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
   
           <DropdownMenuItem
