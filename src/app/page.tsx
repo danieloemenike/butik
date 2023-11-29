@@ -1,3 +1,4 @@
+
 import React from 'react'
 import Header from './_components/Header'
 import Hero from './_components/Hero'
@@ -7,11 +8,11 @@ type Props = {}
 
 function Home({}: Props) {
   return (
-    <section className='bg-background dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-800 via-black to-black'>
+    <main className='bg-background dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-800 via-black to-black'>
       <Header dashboardButton  />
       <Hero />
       {/* <Footer /> */}
-    </section>
+    </main>
   )
 }
 

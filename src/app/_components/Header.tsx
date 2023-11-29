@@ -62,7 +62,7 @@ async function Header({ dashboardButton}: Props) {
                             {/* <p className="text-2xl">
                                  Hi {user?.given_name} {user?.family_name}
                                 </p> */}
-                                        <Button variant="destructive">
+                                         <Button variant="destructive">
                                         <LogoutLink className=" ">Logout</LogoutLink>
                                         </Button>
                             
@@ -71,7 +71,8 @@ async function Header({ dashboardButton}: Props) {
                         </div>)
                     }
                        
-                    </nav>
+        </nav > 
+                   
                     </main>
                    
             </header>
