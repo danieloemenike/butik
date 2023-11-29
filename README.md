@@ -1,3 +1,13 @@
+# MULTI VENDOR ECOMMERCE DASHBOARD
+
+![1701250438392](image/README/1701250438392.png)
+
+![1701250491529](image/README/1701250491529.png)
+
+Users can create multiple store front and get customized api(s)) based on that unique store
+
+![1701250603316](image/README/1701250603316.png)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
