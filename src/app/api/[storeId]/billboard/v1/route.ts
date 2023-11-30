@@ -70,23 +70,11 @@ export async function POST(req: Request,
 
 export async function GET(req:Request,{ params }: { params: { storeId: string } } ) {
     try {
-        const { getUser, isAuthenticated } = getKindeServerSession()
-    
-        const userInfo = await getUser()
-            const userId = userInfo?.id
-     
-            const isAuth = await isAuthenticated()
        
-        if (!isAuth) {
-            return new NextResponse("unauthorized", {status: 401})
-        }
-        if (!userId) {
-            return new NextResponse("UnAuthorized", {status: 403})
-        }
 
-        const signUpUrl = new URL('/sign-up',req.url)
+
         if (!params.storeId) {
-            return NextResponse.redirect(signUpUrl)
+            return new NextResponse("Store id is required", { status: 400 });
         }
         const billboards = await prismadb.billboard.findMany({
             where: {

@@ -8,21 +8,9 @@ export async function GET(
   { params }: { params: { categoryId: string , storeId?: string} }
 ) {
     try {
-      const { getUser, isAuthenticated } = getKindeServerSession()
-    
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-      const isAuth = await isAuthenticated();
+      
 
      
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
-
-    if (!params.categoryId) {
-      return new NextResponse("Category id is required", { status: 400 });
-    }
     // if (!params.storeId) {
     //     return new NextResponse("Store id is required", { status: 400 });
     //   }

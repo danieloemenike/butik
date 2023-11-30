@@ -9,17 +9,6 @@ export async function GET(
   { params }: { params: { productId: string, storeId: string } }
 ) {
   try {
-    const { getUser, isAuthenticated } = getKindeServerSession()
-    
-    const userInfo = await getUser()
-        const userId = userInfo?.id
- 
-        const isAuth = await isAuthenticated()
-   
-    if (!isAuth) {
-        return new NextResponse("unauthorized", {status: 401})
-    }
-
     if (!params.productId) {
       return new NextResponse("Product id is required", { status: 400 });
     }

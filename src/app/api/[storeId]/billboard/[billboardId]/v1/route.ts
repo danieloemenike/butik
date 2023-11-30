@@ -4,35 +4,12 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request, { params }: { params: { storeId: string, billboardId: string } }) {
     try {
-      const { getUser, isAuthenticated } = getKindeServerSession()
     
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-          const isAuth = await isAuthenticated()
-     
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
-        if (!userId) {
-            return new NextResponse("UnAuthorized", {status: 403})
-        }
         if (!params.billboardId) {
             return new NextResponse("Billboard id is required", { status: 400 });
           }
           if (!params.storeId) {
             return new NextResponse("Store id is required", { status: 400 });
-          }
-    
-          const storeByUserId = await prismadb.store.findFirst({
-            where: {
-              id: params.storeId,
-              userId,
-            }
-          });
-      
-          if (!storeByUserId) {
-            return new NextResponse("Unauthorized", { status: 405 });
           }
       
 
@@ -51,7 +28,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string,
         
         
         if (!billboardByUserId) {
-            return new NextResponse("Unauthorized", { status: 405 });
+          return new NextResponse("Billboard Not found", {status: 404})
           }
 
           return NextResponse.json(billboardByUserId);

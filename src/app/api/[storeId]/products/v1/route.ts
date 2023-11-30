@@ -336,16 +336,7 @@ export async function GET(
   { params }: { params: { storeId: string } },
 ) {
     try {
-      const { getUser, isAuthenticated } = getKindeServerSession()
-    
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-          const isAuth = await isAuthenticated()
      
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
     const { searchParams } = new URL(req.url)
     const categoryId = searchParams.get('categoryId') || undefined;
     const colorId = searchParams.get('colorId') || undefined;

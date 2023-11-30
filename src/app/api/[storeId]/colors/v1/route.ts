@@ -75,31 +75,8 @@ export async function POST(
     req: Request,
     { params }: { params: { storeId?: string } }
   ) {
-      try {
-        const { getUser, isAuthenticated } = getKindeServerSession()
     
-        const userInfo = await getUser()
-            const userId = userInfo?.id
-     
-            const isAuth = await isAuthenticated()
-       
-        if (!isAuth) {
-            return new NextResponse("unauthorized", {status: 401})
-        }
-          
-     
-        
-      const storeByUserId = await prismadb.store.findFirst({
-        where: {
-          id: params.storeId,
-          userId
-        }
-      });
-  
-      if (!storeByUserId) {
-        return new NextResponse("Unauthorized", { status: 405 });
-      }
-  
+  try {
       const colors = await prismadb.color.findMany({
         where:{
           OR: [

@@ -10,19 +10,7 @@ export async function GET(
     { params }: { params: { sizeId: string, storeId?: string } }
   ) {
     try {
-      const { getUser, isAuthenticated } = getKindeServerSession()
-    
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-          const isAuth = await isAuthenticated()
-     
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
-        if (!userId) {
-            return new NextResponse("UnAuthorized", {status: 403})
-        }
+      
       if (!params.sizeId) {
         return new NextResponse("Size id is required", { status: 400 });
         }
