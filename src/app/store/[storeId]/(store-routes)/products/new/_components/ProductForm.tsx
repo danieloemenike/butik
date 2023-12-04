@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash, TrashIcon } from "lucide-react";
 import {
@@ -46,7 +46,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
-	name: z.string().min(1),
+	name: z.string().min(1).max(50),
+	slug: z.string(),
 	description: z
 		.string()
 		.min(10)
@@ -126,7 +127,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 
 	const [addProduct, { isLoading, isError, isSuccess }] =
 		useAddProductMutation();
-
+	
 	// const { data: categories = [], error, isLoading: isBillboardLoading, isFetching, isSuccess: isBillboardSuccessful, isError: isBillboardError } = useGetCategoriesQuery(`${params.storeId}`, { refetchOnMountOrArgChange: true });
 
 	const {
@@ -153,6 +154,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 
 	const defaultValues = {
 		name: "",
+		slug: "",
 		description: "",
 		images: [],
 		quantity: 0,
@@ -180,7 +182,26 @@ export const ProductForm = ({ categories }: ProductProps) => {
 		resolver: zodResolver(formSchema),
 		defaultValues,
 	});
+	
+// Slug
+const businessNameValue = useWatch({ control: form.control, name: 'name' });
+const [businessSlugDisplay, setBusinessSlugDisplay] = useState('');
+	const [businessSlugSubmission, setBusinessSlugSubmission] = useState('');
 
+	useEffect(() => {
+        // Initialize businessSlug with the initial value of businessSlugName
+        const slug = businessNameValue.replace(/\s+/g, "_").toLowerCase();
+
+        // const fullSlug = defaultUrl + slug;
+
+        setBusinessSlugDisplay(slug);
+
+        // Set the slug without the default URL for submission
+        setBusinessSlugSubmission(slug);
+    
+        form.setValue("slug", slug);
+	}, [businessNameValue, form]);
+	
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
 		name: "productVariant",
@@ -310,7 +331,41 @@ export const ProductForm = ({ categories }: ProductProps) => {
 									<FormMessage />
 								</FormItem>
               ) } />
-            
+             
+                      <FormField control={form.control} name = "slug" render={ ({ field }) => (
+                              <FormItem>
+                                  <FormLabel>
+                                      Product Unique Slug <span className="text-red-600 font-bold">(Please Don't Edit!)</span>
+                                  </FormLabel>
+                                  <FormControl>
+                                      <Input placeholder="Unique Business UserName" value = {businessSlugDisplay} readOnly />
+                               </FormControl>
+                                 <FormMessage defaultValue="Dont Edit This" />
+                          </FormItem>
+                      )}
+						/>
+						<FormField
+							control={form.control}
+							name="quantity"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Quantity</FormLabel>
+									<FormControl>
+										<Input
+											type="number"
+											disabled={loading}
+											placeholder="9.99"
+											{...field}
+										/>
+									</FormControl>
+									<FormDescription className="capitalize">
+										How Many Do You Have in stock?
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+                      
 						<div className="col-span-2 min-h-[70px]">
 							<FormField
 								control={form.control}
@@ -335,27 +390,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 								)}
 							/>
 						</div>
-						<FormField
-							control={form.control}
-							name="quantity"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Quantity</FormLabel>
-									<FormControl>
-										<Input
-											type="number"
-											disabled={loading}
-											placeholder="9.99"
-											{...field}
-										/>
-									</FormControl>
-									<FormDescription className="capitalize">
-										How Many Do You Have in stock?
-									</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						
 						<FormField
 							control={form.control}
 							name="price"

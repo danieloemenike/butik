@@ -1,20 +1,30 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url  	= env("DATABASE_URL")
+//   directUrl = env("DIRECT_URL")
+
+//   // If you want to use Prisma Migrate, you will need to manually create a shadow database
+//   // https://neon.tech/docs/guides/prisma-migrate#configure-a-shadow-database-for-prisma-migrate
+//   // make sure to append ?connect_timeout=10 to the connection string
+//   // shadowDatabaseUrl = env(“SHADOW_DATABASE_URL”)
+// }
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url  	= env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-  // If you want to use Prisma Migrate, you will need to manually create a shadow database
-  // https://neon.tech/docs/guides/prisma-migrate#configure-a-shadow-database-for-prisma-migrate
-  // make sure to append ?connect_timeout=10 to the connection string
-  // shadowDatabaseUrl = env(“SHADOW_DATABASE_URL”)
+  provider = "mysql"
+  url = env("DATABASE_URL")
+  relationMode = "prisma"
 }
-
+  
 
 
 
@@ -66,7 +76,7 @@ model Store {
   country String?
   userId          String? 
   businessId      String
-
+  storeSlug  String? @unique
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -125,7 +135,8 @@ model SubCategory {
 }
 model Product {
   id          String    @id @default(cuid())
-  name        String
+  name        String    
+  slug String? @unique
    description String?   @db.VarChar(500)
   price       Decimal
   discountedPrice Decimal?
@@ -158,12 +169,13 @@ model Product {
   images      Image[]   // Relation to Image model
 
   orderItems  OrderItem[]   // Relation to Order model
-
+   
   @@index([storeId])
   @@index([categoryId])
   @@index([subcategoryId])
   @@index([sizeId])
   @@index([colorId])
+  
 }
 
 model ProductVariant {
@@ -174,7 +186,7 @@ model ProductVariant {
   size     Size?    @relation(fields: [sizeId], references: [id])
   quantity Int?     // You can adjust the data type based on your requirements
  price       Decimal
- discountedPrice Decimal
+ discountedPrice Decimal?
   // Foreign key
 
   // Black Friday deal fields

@@ -1,13 +1,13 @@
 
 "use client"
 
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components//ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from 'axios'
 import Router from "next/router"
 import { useParams, useRouter } from "next/navigation"
@@ -21,6 +21,7 @@ const formSchema = z.object({
     }).max(30, {
         message: "Your store name cannot be more than 30 characters"
     }),
+    storeSlug: z.string(),
     storePhoneNumber: z.string(),
     storeAddress: z.string().min(3, {
         message: "Your business address is too short! Please add more information to it"
@@ -55,26 +56,44 @@ export default function NewStoreForm() {
             storePhoneNumber: "",
             storeAddress: "",
             storeCity: "Lagos",
-            storeCountry:"Nigeria"
-            
+            storeCountry:"Nigeria",
+            storeSlug: "@"
        }
 
     })
     
+    const storeSlugValue = useWatch({ control: form.control, name: 'storeName' });
+    const [storeSlugDisplay, setStoreSlugDisplay] = useState('');
+    const [storeSlugSubmission, setStoreSlugSubmission] = useState('');
+    useEffect(() => {
+        // Initialize businessSlug with the initial value of businessSlugName
+        const slug = storeSlugValue.replace(/\s+/g, "_").toLowerCase();
+
+
+        setStoreSlugDisplay(slug);
+
+        // Set the slug without the default URL for submission
+        setStoreSlugSubmission(slug);
     
+        form.setValue("storeSlug", slug);
+    }, [storeSlugValue, form ]);
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             setLoading(true)
             const response = await axios.post(`/api/business/${params.businessId}/stores/v1`, values)
             console.log("success")
             
-            if (response) {
+            if (response.status == 200) {
                 toast({
                     title:"Success",
                     description: "Your Store has been created",
-                  })
-                router.refresh()
-                router.push(`/business/${params.businessId}`)
+                })
+                console.log(response)
+                router.push(`/store/${response.data.id}/dashboard`)
+                // router.refresh()
+                
+                // router.push(`/business/${params.businessId}`)
+               
             } else {
                 toast({
                     variant: "destructive",
@@ -98,11 +117,11 @@ export default function NewStoreForm() {
         }
     }
     return (
-        <main className = " w-[70%]  mx-auto mt-[40px]">
+        <main className = " w-[85%]  mx-auto mt-[40px]">
         
           <Form { ...form }>
             <form onSubmit={ form.handleSubmit(onSubmit) } className="space-y-8">
-                   <main className="grid grid-cols-2 gap-4">
+                   <main className="grid grid-cols-2 gap-2">
                    <div>
                     <FormField control={form.control} name = "storeName" render={ ({ field }) => (
                             <FormItem>
@@ -116,7 +135,21 @@ export default function NewStoreForm() {
                         </FormItem>
                     )}
                     />
-                    </div>
+                        </div>
+                        <div>
+                      <FormField control={form.control} name = "storeSlug" render={ ({ field }) => (
+                              <FormItem>
+                                  <FormLabel>
+                                      Unique Store Slug <span className="text-indigo-600 font-bold">(System Generated)</span>
+                                  </FormLabel>
+                                  <FormControl>
+                                      <Input placeholder="System Generated" value = {`@${storeSlugDisplay}`} readOnly />
+                               </FormControl>
+                                 <FormMessage defaultValue="Dont Edit This" />
+                          </FormItem>
+                      )}
+                      />
+                      </div>
                         <div>
                     <FormField control={form.control} name = "storePhoneNumber" render={ ({ field }) => (
                             <FormItem>

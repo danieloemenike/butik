@@ -11,7 +11,7 @@ export async function POST(request: Request, { params }: { params: { businessId:
   
     const isAuth = await isAuthenticated()
         const body = await request.json()
-        const { storeName, storePhoneNumber, storeAddress, storeCity, storeCountry } = body
+        const { storeName, storePhoneNumber, storeAddress, storeCity, storeCountry, storeSlug } = body
         
         if (!isAuth) {
             return new NextResponse("unauthorized", {status: 401})
@@ -29,12 +29,16 @@ export async function POST(request: Request, { params }: { params: { businessId:
         const store = await prismadb.store.create({
             data: {
                 userId,
+                storeSlug,
                 businessId: params.businessId,
                 name: storeName,
                 phoneNumber: storePhoneNumber,
                 address: storeAddress,
                 city: storeCity,
                 country : storeCountry
+            },
+            select: {
+                id:true
             }
         })
         
