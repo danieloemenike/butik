@@ -29,12 +29,12 @@ import { Button } from '@/components/ui/button'
         
       </div>
     
-      <div className='container grid grid-cols-1 lg:grid-cols-2 w-full my-auto h-[60dvh] '>
-    <div className='flex items-center justify-center'>
+      <div className='container grid grid-cols-1 lg:grid-cols-2 w-full my-auto h-[70dvh] '>
+    <div className='flex items-center justify-center w-full h-full'>
         <NewStoreForm />
     </div>
-    <div className="  lg:flex items-center justify-center hidden ">
-        <Image width={ 500 } height={ 500} className="object-fit" src="/purchase.svg" alt="shopping image"/>
+    <div className="  lg:flex items-center justify-center hidden w-[70%] h-full">
+        <Image width={ 400 } height={ 400} className="object-fit" src="/purchase.svg" alt="shopping image"/>
     </div>
     </div>
   </section>

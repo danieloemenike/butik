@@ -90,7 +90,7 @@ export default function NewStoreForm() {
                 })
                 console.log(response)
                 router.push(`/store/${response.data.id}/dashboard`)
-                // router.refresh()
+                router.refresh()
                 
                 // router.push(`/business/${params.businessId}`)
                
@@ -117,11 +117,11 @@ export default function NewStoreForm() {
         }
     }
     return (
-        <main className = " w-[85%]  mx-auto mt-[40px]">
+        <main className = " w-[95%]  mx-auto mt-[40px]">
         
           <Form { ...form }>
             <form onSubmit={ form.handleSubmit(onSubmit) } className="space-y-8">
-                   <main className="grid grid-cols-2 gap-2">
+                   <main className="grid lg:grid-cols-2 grid-cols-1 lg:gap-2 gap-6">
                    <div>
                     <FormField control={form.control} name = "storeName" render={ ({ field }) => (
                             <FormItem>

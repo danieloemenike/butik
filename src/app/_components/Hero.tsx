@@ -9,16 +9,16 @@ type Props = {};
 
 function Hero({}: Props) {
 	return (
-		<section className="grid md:grid-cols-2 h-[87dvh] container md:px-8 gap-2">
+		<section className="grid md:grid-cols-2 grid-cols-1 h-[87dvh] container md:px-8 gap-2">
 			<div className=" w-[100%] h-full ">
-				<h1 className="md:text-[3rem] text-[2rem]  font-bold md:mt-[115px] tracking-tighter mt-[15px] md:tracking-loose text-black/90 dark:text-white">
+				<h1 className="md:text-[3rem] text-[2rem]  font-bold md:mt-[115px] tracking-tighter mt-[35px] md:tracking-loose text-black/90 dark:text-white">
 					{" "}
 					Your{" "}
 					<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-black to-fuchsia-500 dark:bg-gradient-to-r dark:from-indigo-500 dark:to-fuchsia-500">
 						{" "}
 						E-Commerce{" "}
 					</span>{" "}
-					Partner <br /> For Success{" "}
+					Success Partner
 				</h1>
 				<div className=" pr-4">
 					<p className="text-muted-foreground dark:text-slate-300 mt-[15px] md:text-lg text-sm leading-loose p-1 ">

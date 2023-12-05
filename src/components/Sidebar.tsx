@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowBigLeftIcon, ArrowLeftCircleIcon, ArrowLeftFromLineIcon, MenuIcon, MenuSquareIcon, Sparkles } from 'lucide-react'
 import SideBarMenu from './MenuRoutes'
 type Props = {
-    storeName : string | null
+    storeName ?: string
 }
 
 export default function Sidebar({storeName}: Props) {
@@ -28,11 +28,10 @@ export default function Sidebar({storeName}: Props) {
           {/* LOGO DESIGN */ }
           
           <div className="flex flex-wrap justify-start mb-7 mt-5 truncate ...">
-          { storeName ? (
-              <h2 className="tracking-tighter font-bold truncate">{ storeName }</h2>
-          ) : (
-             <h2 className="tracking-tighter font-bold">butik</h2>
-         )} 
+              { storeName && (
+                  <h2 className="tracking-tighter font-bold truncate">{ storeName }</h2>
+              )
+              }
           </div>
         
          

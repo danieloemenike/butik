@@ -50,61 +50,65 @@ export default async function StoreHeader() {
    
     return (
         <>
-             <header className=" h-[4rem] shadow-md px-[2rem] py-[1rem] flex items-center justify-between  top-0  w-[80%] mt-2 rounded-full ml-56 bg-clip-padding backdrop-filter backdrop-blur-xl z-50 bg-opacity-5 dark:bg-neutral-900 sticky" >
-             <div className=" h-full flex items-center  w-full ">
-                    <Link href="/"> <h2 className="font-extrabold tracking-tighter text-2xl cursor-pointer  w-[140px] text-center dark:text-white text-black items-center h-[30px]  "> butik </h2> </Link> 
-                </div>
-                <main className='flex items-center h-[100%] justify-evenly  w-full'>
-                    <ModeToggle />
-                   
-                <nav className='gap-4 h-[100%] flex  '>
-                 
-                    { !isAuth ?
-                            (<>
-                                <div className='flex items-center justify-center  h-full w-full gap-4 '>
-                                    <Button variant="ghost">
-                                    <LoginLink className="">Sign in</LoginLink>
-                                    </Button>
-                                    <Button className="bg-primary">
-                                    <RegisterLink className="text-primary-foreground font-bold ">Get Started</RegisterLink>
-                                    </Button>
-                                    
-                                    </div>
-                            </>)
-                        :
-                       ( 
-                       
-                                <div className="flex w-full h-[100%] items-center mx-auto">
-                                    { dashboardButton && <Button variant="ghost" className='border mr-4 rounded-full font-bold dark:border-white border-black'>
-                                        <Link href="/register-business">  Dashboard </Link>
-                                    </Button>
-                                    }
-                            { user?.picture ? (
-                                <Image className="rounded-full" src={ user?.picture } width={ 55 } height={ 55} alt = "user profile avatar" priority />
-                            ) :
-                                (
-                                    <div className='bg-primary text-primary-foreground rounded-full p-4'>
-                                        {user?.given_name?.[0]}
-                                            {user?.family_name?.[0]}
-                                    </div>
-                                )
-                            }
+             <header className=" h-[5rem] shadow-md md:py-[1rem]  top-0  md:w-[1024px] max-w-[100vw] mt-2 md:rounded-full md:ml-56 bg-clip-padding backdrop-filter backdrop-blur-xl z-50 bg-opacity-5 dark:bg-neutral-900 sticky" >
+             <div className="container flex items-center justify-between md:px-[2rem] md:py-[1rem]  w-full h-full">
+               
+               <div className=" h-full flex items-center  w-full ">
+                   <Link href="/"> <h2 className="font-extrabold tracking-tighter text-2xl cursor-pointer  w-[140px] md:text-center dark:text-white text-black items-center h-[30px]  "> butik </h2> </Link> 
+               </div>
+               <main className='flex items-center h-[100%] justify-evenly  w-full'>
+                   <ModeToggle />
+                  
+               <nav className='gap-4 h-[100%] flex ml-1 '>
+                
+                   { !isAuth ?
+                           (<>
+                               <div className='flex items-center justify-center  h-full w-full gap-4 '>
+                                   <Button variant="ghost">
+                                   <LoginLink className="">Sign in</LoginLink>
+                                   </Button>
+                                   <Button className="bg-primary">
+                                   <RegisterLink className="text-primary-foreground font-bold ">Get Started</RegisterLink>
+                                   </Button>
+                                   
+                                   </div>
+                           </>)
+                       :
+                      ( 
+                      
+                               <div className="flex w-full h-[100%] items-center mx-auto">
+                                   { dashboardButton && <Button variant="ghost" className='border mr-4 rounded-full font-bold dark:border-white border-black'>
+                                       <Link href="/register-business">  Dashboard </Link>
+                                   </Button>
+                                   }
+                           { user?.picture ? (
+                               <Image className="rounded-full" src={ user?.picture } width={ 40 } height={ 40} alt = "user profile avatar" priority />
+                           ) :
+                               (
+                                   <div className='bg-primary text-primary-foreground rounded-full p-4'>
+                                       {user?.given_name?.[0]}
+                                           {user?.family_name?.[0]}
+                                   </div>
+                               )
+                           }
+                          
+                           <div className= "w-full ml-[2rem] ">
+                           {/* <p className="text-2xl">
+                                Hi {user?.given_name} {user?.family_name}
+                               </p> */}
+                                        <Button variant="destructive">
+                                       <LogoutLink className=" ">Logout</LogoutLink>
+                                       </Button>
                            
-                            <div className= "w-full ml-[2rem] ">
-                            {/* <p className="text-2xl">
-                                 Hi {user?.given_name} {user?.family_name}
-                                </p> */}
-                                        <Button>
-                                        <LogoutLink className=" ">Logout</LogoutLink>
-                                        </Button>
-                            
-                            </div>
+                           </div>
 
-                        </div>)
-                    }
-                       
-                    </nav>
-                    </main>
+                       </div>)
+                   }
+                      
+       </nav > 
+                  
+                   </main>
+                   </div>
             </header>
         
         </>

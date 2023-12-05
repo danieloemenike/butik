@@ -103,8 +103,8 @@ function ProductPage() {
 				</>
 			) :  (
         <>
-     <section className="grid grid-cols-2 h-[50dvh] w-[100%]  my-auto space-y-4 gap-9  ">
-       <div className="flex flex-col h-[100%] justify-center items-start space-y-2 ">
+     <section className="grid grid-cols-1 md:grid-cols-2 h-[50dvh] w-[100%]  my-auto space-y-4 gap-9 px-4 pt-4  ">
+       <div className="flex flex-col h-[100%] justify-center items-start  md:space-y-2 space-y-5 ">
          <h2 className="text-[24px] font-bold tracking-tight">
            {" "}
            Create Your First Store Product{" "}

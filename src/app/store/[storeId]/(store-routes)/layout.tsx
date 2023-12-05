@@ -1,3 +1,4 @@
+import Header from '@/app/_components/Header';
 import SideBar from '@/components/Sidebar';
 import StoreHeader from '@/components/StoreHeader';
 import prismadb from '@/lib/prismadb';
@@ -50,12 +51,15 @@ export default async function StoreLayout({ children, params }: BusinessProps) {
     
     return (
         <>
-        <div className="">
+        <div className="max-w-[100vw] ">
         <SideBar storeName = {store?.name} />
-        <div className='w-full h-full'>
-
-        <StoreHeader />
-                    <div className='max-w-6xl md:ml-[230px] mx-auto mr-[50px] mt-[4px] p-3 '>
+                <div className='w-full h-full'>
+                    <div className="md:ml-48 ml-0">
+                    <Header storeSideBar />
+                    </div>
+      
+        {/* <StoreHeader /> */}
+                    <div className='md:max-w-6xl md:ml-[230px] md:mx-auto md:mr-[50px] md:mt-[4px] md:p-3 '>
                        
   { children }
 

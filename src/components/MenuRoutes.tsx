@@ -13,11 +13,13 @@ export default function SideBarMenu() {
 	return (
 		<nav className=" space-y-6 ">
 			{Menu.map((routes) => (
-				<div className="space-y-4 " key={routes.id}>
+				<div className="space-y-4 " key={ routes.id }>
+					<div className="flex justify-start">
 					<h3 className="cursor-pointer px-3 text-xs text-gray-300 uppercase dark:text-gray-400">
 						{" "}
 						{routes.label}{" "}
 					</h3>
+					</div>
 					{routes.menu.map((route) => (
 						<Link
 							href={`/store/${params?.storeId}${route.path}`}

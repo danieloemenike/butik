@@ -105,8 +105,8 @@ function StoreList() {
 				</>
 			) : (
 				<>
-					<section className="grid grid-cols-2 h-[80dvh] w-[100%]  my-auto space-y-4 gap-9  ">
-						<div className="flex flex-col h-[100%] justify-center items-start space-y-4 ">
+					<section className="grid md:grid-cols-2 grid-cols-1 h-[80dvh] w-[100%]  my-auto space-y-4 gap-9 container ">
+						<div className="flex flex-col h-[100%] justify-center items-start md:space-y-4 space-y-8 mt-10">
 							<h2 className="text-[24px] font-bold tracking-tight">
 								{" "}
 								Congrats {user?.given_name}! Your Business Has Been Registered.{" "}
@@ -120,7 +120,7 @@ function StoreList() {
 							</Button>
 						</div>
 						{/* <FcShop className="lg:text-[15rem] text-[5rem]" /> */}
-						<div className="h-[100%] flex items-center">
+						<div className="h-[100%] flex items-center md:w-[90%] justify-center">
 							<Image
 								src="/store.svg"
 								width={550}

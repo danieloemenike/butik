@@ -78,11 +78,12 @@ export default function BusinessForm() {
         try {
             setLoading(true)
             const response = await addBusiness({ data }).unwrap();
-          if(!response) return
+            if (!response) return
+            console.log(response)
             toast({
                 description: "Business Created Successfully.",
               })
-              router.refresh()
+             
             router.push(`/business/${response?.id}`)
             
         } catch (error) {
@@ -101,11 +102,11 @@ export default function BusinessForm() {
     return (
     <>
          
-            <main className = " w-[80%]  mx-auto mt-[40px] mb-[10px]">
+            <main className = " w-[90%]  mx-auto mt-[40px] mb-[10px]">
         
             <Form { ...form } >
               <form onSubmit={ form.handleSubmit(onSubmit) } className="space-y-8" >
-                     <main className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                     <main className="grid grid-cols-1 lg:grid-cols-2 md:gap-4 gap-8">
                      <div>
                       <FormField control={form.control} name = "businessName" render={ ({ field }) => (
                               <FormItem>
