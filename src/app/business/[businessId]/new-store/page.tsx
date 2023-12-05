@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
     return (
       <section className=' h-screen w-full'>
       <Header />
-            <div className="grid place-items-center mt-8  h-14 w-full leading-tight group space-y-4 ">
+            <div className="grid place-items-center mt-8  h-14 w-full leading-tight group space-y-3 ">
           {/* <div className = "flex items-center ">
               <Button variant="default" >
             <ArrowBigLeftDash />
@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button'
            
           </div> */}
           
-                <h2 className="font-bold text-lg lg:text-2xl tracking-tighter"> Let's Create Your Brand's Store Presence </h2>
+                <h2 className="font-bold text-base lg:text-2xl tracking-tighter"> Let's Create Your Brand's Store Presence </h2>
                 {/* <div className="flex">
                 <StoreIcon className="text-center text-5xl"/> <Sparkles />
                 </div> */}
