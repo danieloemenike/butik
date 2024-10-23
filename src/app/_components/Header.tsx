@@ -20,7 +20,7 @@ async function Header({ dashboardButton, storeSideBar}: Props) {
 
     return (
         <>
-            <header className="bg-background h-[5rem] shadow-md   top-0  w-full  bg-clip-padding backdrop-filter backdrop-blur-xl z-30 bg-opacity-5 sticky ">
+            <header className="bg-background h-[5rem]   top-0  w-full  bg-clip-padding backdrop-filter backdrop-blur-xl z-30 bg-opacity-5 sticky ">
                 <div className="container flex items-center justify-between pl-1 pr-1 md:px-[2rem] md:py-[1rem]  w-full h-full sticky">
                 
                     <div className=" h-full flex items-center justify-stretch w-full gap-4 pl-2 ">

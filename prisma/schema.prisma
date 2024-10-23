@@ -1,291 +1,229 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-// datasource db {
-//   provider = "postgresql"
-//   url  	= env("DATABASE_URL")
-//   directUrl = env("DIRECT_URL")
-
-//   // If you want to use Prisma Migrate, you will need to manually create a shadow database
-//   // https://neon.tech/docs/guides/prisma-migrate#configure-a-shadow-database-for-prisma-migrate
-//   // make sure to append ?connect_timeout=10 to the connection string
-//   // shadowDatabaseUrl = env(“SHADOW_DATABASE_URL”)
-// }
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
-  
-
-
 
 model Business {
-  id              String    @id @default(cuid())
-  name            String   
-  phoneNumber   String?
-  userId String? 
-  email String?
-  address String
-  city  String
-  country String
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  confirmed Boolean @default(false)
-  registered Boolean @default(false)
-  // slug String @unique
+  id          String   @id @default(cuid())
+  name        String
+  phoneNumber String?
+  userId      String?
+  email       String?
+  address     String
+  city        String
+  country     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  confirmed   Boolean  @default(false)
+  registered  Boolean  @default(false)
+  stores      Store[]  @relation("BusinessToStore")
+  user        User?    @relation("BusinessToUser")
 
-  //relations
-  stores          Store[]    @relation("BusinessToStore")
-  user  User?  @relation("BusinessToUser")
-
-  // Composite unique constraint on the `businessName` and `country` fields
-   @@unique([name, country], name: "business_identifier")
-
+  @@unique([name, country], name: "business_identifier")
 }
 
-model User{
-  id String @id @default(cuid())
+model User {
+  id          String   @id @default(cuid())
   phoneNumber String?
-  email String?
-  imageUrl String?
-  age String?
-  userName String? @unique
-  businessId String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime  @updatedAt()
-  business  Business @relation("BusinessToUser", fields: [businessId], references: [id]) 
+  email       String?
+  imageUrl    String?
+  age         String?
+  userName    String?  @unique
+  businessId  String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  business    Business @relation("BusinessToUser", fields: [businessId], references: [id])
 
   @@index([businessId])
 }
 
 model Store {
-  id              String    @id @default(cuid())
-  name            String
-  phoneNumber   String?
-  address String?
-  city  String?
-  country String?
-  userId          String? 
-  businessId      String
-  storeSlug  String? @unique
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id          String      @id @default(cuid())
+  name        String
+  phoneNumber String?
+  address     String?
+  city        String?
+  country     String?
+  userId      String?
+  storeSlug   String?     @unique 
+  businessId  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  billboards  Billboard[] @relation("StoreToBillboard")
+  colors      Color[]     @relation("StoreToColor")
+  orders      Order[]     @relation("StoreToOrder")
+  products    Product[]   @relation("StoreToProduct")
+  sizes       Size[]      @relation("StoreToSize")
+  business    Business    @relation("BusinessToStore", fields: [businessId], references: [id])
 
-  //relations
- business       Business   @relation("BusinessToStore",fields:[businessId], references:[id])
-  billboards Billboard[] @relation("StoreToBillboard")
- 
-  products        Product[]  @relation("StoreToProduct")
-  
-  orders          Order[]     @relation("StoreToOrder")
-
-   sizes       Size[]     @relation("StoreToSize")
-  colors          Color[]     @relation("StoreToColor")
   @@index([businessId])
 }
 
 model Billboard {
-
-  id String @id @default(cuid())
-  label String
-  imageUrl String
-  promotionText String?
+  id                String   @id @default(cuid())
+  label             String
+  imageUrl          String
+  promotionText     String?
   promotionImageUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  //relations
-  storeId String
-  store Store @relation("StoreToBillboard", fields: [storeId], references:[id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  storeId           String
+  store             Store    @relation("StoreToBillboard", fields: [storeId], references: [id])
 
   @@index([storeId])
-
 }
 
 model Category {
-  id          String      @id @default(cuid())
-  name        String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id            String        @id @default(cuid())
+  name          String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  products      Product[]     @relation("CategoryToProduct")
   subcategories SubCategory[] @relation("CategoryToSubCategory")
-   //relations
- products    Product[]   @relation("CategoryToProduct")
-
-
 }
 
 model SubCategory {
-  id String @id @default(cuid())
-  name        String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   categoryId String
-  category Category @relation("CategoryToSubCategory", fields:[categoryId], references:[id])
-  products    Product[]   @relation("SubcategoryToProduct")
-   @@index([categoryId])
+  products   Product[] @relation("SubcategoryToProduct")
+  category   Category  @relation("CategoryToSubCategory", fields: [categoryId], references: [id])
+
+  @@index([categoryId])
 }
+
 model Product {
-  id          String    @id @default(cuid())
-  name        String    
-  slug String? @unique
-   description String?   @db.VarChar(500)
-  price       Decimal
-  discountedPrice Decimal?
-  quantity Decimal?
-  isFeatured  Boolean   @default(false)
-  isArchived  Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-
-   // Black Friday deal fields
+  id                   String           @id @default(cuid())
+  name                 String
+  slug                 String?          @unique
+  description          String?          @db.VarChar(500)
+  price                Decimal
+  discountedPrice      Decimal?
+  quantity             Decimal?
+  isFeatured           Boolean          @default(false)
+  isArchived           Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
   blackFridayStartDate DateTime?
-  blackFridayEndDate DateTime?
-  //relations
-   storeId     String    // Foreign Key to Store
-  store       Store     @relation("StoreToProduct", fields: [storeId], references: [id])
+  blackFridayEndDate   DateTime?
+  storeId              String
+  categoryId           String
+  subcategoryId        String
+  sizeId               String
+  colorId              String
+  images               Image[]
+  orderItems           OrderItem[]
+  category             Category         @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  color                Color            @relation(fields: [colorId], references: [id])
+  size                 Size             @relation(fields: [sizeId], references: [id])
+  store                Store            @relation("StoreToProduct", fields: [storeId], references: [id])
+  subcategory          SubCategory      @relation("SubcategoryToProduct", fields: [subcategoryId], references: [id])
+  productVariant       ProductVariant[]
 
-  categoryId  String    // Foreign Key to Category
-  category    Category  @relation("CategoryToProduct", fields: [categoryId], references: [id])
-
-   subcategoryId  String    // Foreign Key to Category
-  subcategory    SubCategory  @relation("SubcategoryToProduct", fields: [subcategoryId], references: [id])
-  
-   sizeId      String    // Foreign Key to Size
-  size        Size      @relation(fields: [sizeId], references: [id])
-
-  colorId     String    // Foreign Key to Color
-  color       Color     @relation(fields: [colorId], references: [id])
-  productVariant  ProductVariant[]
-  images      Image[]   // Relation to Image model
-
-  orderItems  OrderItem[]   // Relation to Order model
-   
   @@index([storeId])
   @@index([categoryId])
   @@index([subcategoryId])
   @@index([sizeId])
   @@index([colorId])
-  
 }
 
 model ProductVariant {
-  id       String   @id @default(cuid())
-   colorId     String 
-   sizeId      String    // Foreign Key to Size
-  color    Color?   @relation(fields: [colorId], references: [id])
-  size     Size?    @relation(fields: [sizeId], references: [id])
-  quantity Int?     // You can adjust the data type based on your requirements
- price       Decimal
- discountedPrice Decimal?
-  // Foreign key
-
-  // Black Friday deal fields
+  id                   String    @id @default(cuid())
+  colorId              String
+  sizeId               String
+  quantity             Int?
+  price                Decimal
+  discountedPrice      Decimal?
   blackFridayStartDate DateTime?
-  blackFridayEndDate DateTime?
+  blackFridayEndDate   DateTime?
+  productId            String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  images               Image[]
+  color                Color     @relation(fields: [colorId], references: [id])
+  product              Product   @relation(fields: [productId], references: [id])
+  size                 Size      @relation(fields: [sizeId], references: [id])
 
-  productId String
-  product    Product @relation(fields: [productId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  // Other relations and indexes...
-  images      Image[]
   @@index([productId])
   @@index([sizeId])
   @@index([colorId])
 }
 
-
 model Size {
-  id          String    @id @default(cuid())
-  name        String
-  value       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  storeId     String?      // Foreign Key to Store
- 
-  store       Store?       @relation("StoreToSize", fields: [storeId], references: [id])
-  //relations
-  
-  products    Product[] // Relation to Product model
-  productVariant  ProductVariant[]
-   @@index([storeId])
+  id             String           @id @default(cuid())
+  name           String
+  value          String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  storeId        String?
+  products       Product[]
+  productVariant ProductVariant[]
+  store          Store?           @relation("StoreToSize", fields: [storeId], references: [id])
+
+  @@index([storeId])
 }
 
 model Color {
-  id          String   @id @default(cuid())
-  name        String
-  value       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String           @id @default(cuid())
+  name           String
+  value          String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  storeId        String?
+  store          Store?           @relation("StoreToColor", fields: [storeId], references: [id])
+  products       Product[]
+  productVariant ProductVariant[]
 
-  //relations
-  
-  storeId     String?   // Foreign Key to Store
-  store       Store?    @relation("StoreToColor", fields: [storeId], references: [id]) 
-  products    Product[] // Relation to Product model
-  productVariant  ProductVariant[]
   @@index([storeId])
 }
 
 model Order {
-  id          String    @id @default(cuid())
-  
-  isPaid     Boolean   @default(false)
-  phone      String    @default("")
-  address    String    @default("")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  //relations
-  storeId     String    // Foreign Key to Store
-  store       Store     @relation("StoreToOrder", fields: [storeId], references: [id])
-
-  orderItems OrderItem[] // Relation to OrderItem model
+  id         String      @id @default(cuid())
+  isPaid     Boolean     @default(false)
+  phone      String      @default("")
+  address    String      @default("")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  storeId    String
+  store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems OrderItem[]
 
   @@index([storeId])
-  
 }
 
-// Intermediary for a many-to-many relationship
 model OrderItem {
   id        String  @id @default(cuid())
-
-  //relations
-  orderId   String  // Foreign Key to Order
+  orderId   String
+  productId String
   order     Order   @relation(fields: [orderId], references: [id])
-
-  productId String  // Foreign Key to Product
   product   Product @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
 }
 
-
-
 model Image {
-  id          String   @id @default(cuid())
-  url         String   // URL of the image
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String          @id @default(cuid())
+  url              String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  productId        String
+  productVariantId String?
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
 
-  //relations
-productId   String   // Foreign Key to Product
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-productVariantId   String?   // Foreign Key to Product
-  productVariant     ProductVariant?  @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
   @@index([productId])
   @@index([productVariantId])
 }
 
-
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
+}
