@@ -6,14 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prisma": {
-      "seed": "ts-node scripts/seed.ts"
-    }
+    "lint": "next lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@kinde-oss/kinde-auth-nextjs": "2.0.10",
+    "@neondatabase/serverless": "^0.10.1",
+    "@prisma/adapter-neon": "^5.21.1",
     "@prisma/client": "^5.21.1",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
@@ -36,11 +35,13 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@reduxjs/toolkit": "^1.9.7",
     "@tanstack/react-table": "^8.10.7",
+    "@types/ws": "^8.5.12",
     "axios": "^1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.4.5",
     "lucide-react": "^0.292.0",
     "next": "14.0.1",
     "next-cloudinary": "^5.7.0",
@@ -57,6 +58,7 @@
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "validator": "^13.11.0",
+    "ws": "^8.18.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -67,7 +69,6 @@
     "pg": "^8.13.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
-    "ts-node": "^10.9.2",
     "typescript": "^5.3.2"
   }
 }

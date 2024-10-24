@@ -32,7 +32,8 @@ export default async function OnboardingLayout({ children, params }: OnBoardingP
     if (!isAuth || !userId) {
         redirect("/")
     }
-    const business = await prismadb?.business.findFirst({
+  try {
+    const business = await prismadb.business.findFirst({
       where: {
           id: params.businessId,
         userId,
@@ -42,7 +43,10 @@ export default async function OnboardingLayout({ children, params }: OnBoardingP
   })
 
   if (business) {
-    redirect(`business/${business?.id}`)
+    redirect(`business/${business.id}`)
+    }
+  } catch (e) {
+    console.log("Database error", e)
 }
   
   return (
