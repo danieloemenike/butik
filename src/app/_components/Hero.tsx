@@ -5,9 +5,7 @@ import {
 } from "@kinde-oss/kinde-auth-nextjs/components";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-type Props = {};
-
-function Hero({}: Props) {
+function Hero() {
 	return (
 		<section className="grid md:grid-cols-2 grid-cols-1 h-[87dvh] container md:px-8 gap-2">
 			<div className=" w-[100%] h-full ">
