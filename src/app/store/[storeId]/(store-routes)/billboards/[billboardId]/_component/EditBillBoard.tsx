@@ -44,7 +44,8 @@ type BillboardFormValues = z.infer<typeof formSchema>
 export const EditBillboardForm = () => {
   
   const params = useParams();
-  const {storeId, billboardId} = params
+  const storeId = String(params.storeId ?? "");
+  const billboardId = String(params.billboardId ?? "");
     const router = useRouter();
     const [addBillboard,{isLoading,isError, isSuccess}] = useAddBillboardMutation();
   const { data: initialData, isSuccess: gottenData } = useGetBillboardQuery({ storeId, billboardId })
@@ -75,7 +76,7 @@ export const EditBillboardForm = () => {
     try {
       setLoading(true);
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
-        await updateBillboard({ storeId: params.storeId, billboardId: params.billboardId, updatedData: data })
+        await updateBillboard({ storeId, billboardId, updatedData: data })
        
       router.refresh();
       router.push(`/store/${storeId}/billboards`);
@@ -90,7 +91,7 @@ export const EditBillboardForm = () => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await deleteBillboard({ storeId: params.storeId, billboardId: params.billboardId })
+      await deleteBillboard({ storeId, billboardId })
       router.refresh();
       router.push(`/store/${storeId}/billboards`);
       

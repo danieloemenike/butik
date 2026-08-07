@@ -38,7 +38,7 @@ type BillboardFormValues = z.infer<typeof formSchema>
 export const NewSizeForm = () => {
   
   const params = useParams();
-  const {storeId, sizeId} = params
+  const storeId = String(params.storeId ?? "");
     const router = useRouter();
     const [addSize,{isLoading,isError, isSuccess}] = useAddSizeMutation();
  
@@ -57,7 +57,7 @@ export const NewSizeForm = () => {
     try {
       setLoading(true);
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
-      await addSize({ storeId: params.storeId, data }).unwrap();
+      await addSize({ storeId, data }).unwrap();
         console.log("success")
       router.refresh();
       router.push(`/store/${storeId}/sizes`);

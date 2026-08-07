@@ -1,6 +1,6 @@
 'use client'
 
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
 import Image from "next/image";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ type BillboardInfoType = {
   storeId: string;
 }
  const columnHelper = createColumnHelper<BillboardInfoType>()
- const columns : ColumnDef<BillboardInfoType, string>[] = [
+ const columns : ColumnDef<BillboardInfoType, any>[] = [
         columnHelper.accessor('label', {
             header: ({column}) => {
             return (

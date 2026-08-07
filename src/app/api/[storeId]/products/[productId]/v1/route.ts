@@ -6,9 +6,10 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { productId: string, storeId: string } }
+  { params: rawParams }: { params: Promise<{ productId: string, storeId: string }> }
 ) {
   try {
+    const params = await rawParams;
     if (!params.productId) {
       return new NextResponse("Product id is required", { status: 400 });
     }
@@ -39,9 +40,10 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { productId: string, storeId: string } }
+  { params: rawParams }: { params: Promise<{ productId: string, storeId: string }> }
 ) {
   try {
+    const params = await rawParams;
     const { getUser, isAuthenticated } = getKindeServerSession()
     
     const userInfo = await getUser()
@@ -88,9 +90,10 @@ export async function DELETE(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { productId: string, storeId: string } }
+  { params: rawParams }: { params: Promise<{ productId: string, storeId: string }> }
 ) {
   try {
+    const params = await rawParams;
     const { getUser, isAuthenticated } = getKindeServerSession()
     
         const userInfo = await getUser()

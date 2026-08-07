@@ -1,21 +1,17 @@
+import { EditColorForm } from "./_component/EditColorData"
+import Heading from "@/components/StoreHeading"
 
-import React from 'react'
-import { EditColorForm } from './_component/EditColorData'
-import Heading from '@/components/StoreHeading'
-
-type Props = {}
-
-function page({}: Props) {
+export default function page() {
   return (
-    <main>
-
-<Heading title="Edit Colors" subtitle="Edit Colors" showButton={ false } />
-      <div className="overflow-y-auto">
-      <EditColorForm />
-
-          </div>
+    <main className="space-y-1">
+      <Heading
+        title="Edit color"
+        subtitle="Update color swatch details"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <EditColorForm />
+      </div>
     </main>
   )
 }
-
-export default page

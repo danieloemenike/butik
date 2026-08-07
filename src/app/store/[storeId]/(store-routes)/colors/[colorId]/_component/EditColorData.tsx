@@ -39,7 +39,8 @@ type BillboardFormValues = z.infer<typeof formSchema>
 export const EditColorForm = () => {
   
   const params = useParams();
-  const {storeId, colorId} = params
+  const storeId = String(params.storeId ?? "");
+  const colorId = String(params.colorId ?? "");
     const router = useRouter();
 
   const { data: initialData, isSuccess: gottenData } = useGetColorQuery({ storeId, colorId})
@@ -68,7 +69,7 @@ export const EditColorForm = () => {
     try {
       setLoading(true);
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
-        await updateColor({ storeId: params.storeId, colorId: params.colorsId, updatedData: data })
+        await updateColor({ storeId, colorId, updatedData: data })
         console.log("success")
       router.refresh();
       router.push(`/store/${storeId}/colors`);
@@ -83,7 +84,7 @@ export const EditColorForm = () => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await deleteColor({ storeId: params.storeId, colorId: params.colorsId })
+      await deleteColor({ storeId, colorId })
       router.refresh();
       router.push(`/store/${storeId}/colors`);
     } catch (error: any) {

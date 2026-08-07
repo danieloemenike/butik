@@ -42,6 +42,7 @@ interface CellActionProps {
   const {toast} = useToast()
   const router = useRouter();
   const params = useParams();
+  const storeId = String(params.storeId ?? "");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
    const [deleteProduct, {isLoading, isError, isSuccess, }] = useDeleteProductMutation();
@@ -50,7 +51,7 @@ interface CellActionProps {
     try {
       setLoading(true);
       
-      await deleteProduct({ storeId: params.storeId, productId: data.id})
+      await deleteProduct({ storeId, productId: data.id})
       
       if (isSuccess) return
       toast({
@@ -92,7 +93,7 @@ interface CellActionProps {
             <Copy className="mr-2 h-4 w-4" /> Copy Id
           </DropdownMenuItem>     
           <DropdownMenuItem
-            onClick={() => router.push(`/store/${params.storeId}/products/${data.id}`)}
+            onClick={() => router.push(`/store/${storeId}/products/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

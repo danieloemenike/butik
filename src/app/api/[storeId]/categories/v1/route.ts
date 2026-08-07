@@ -6,8 +6,9 @@ import { NextResponse } from "next/server";
 
 
 export async function POST(req: Request,
-    { params }: { params: { storeId: string} }) {
+    { params: rawParams }: { params: Promise<{ storeId: string}> }) {
     try {
+        const params = await rawParams;
         const { getUser, isAuthenticated } = getKindeServerSession()
     
         const userInfo = await getUser()
@@ -70,8 +71,9 @@ export async function POST(req: Request,
 }
 
 
-export async function GET(req:Request,{ params }: { params: { storeId: string } } ) {
+export async function GET(req:Request,{ params: rawParams }: { params: Promise<{ storeId: string }> } ) {
     try {
+        const params = await rawParams;
        
         if (!params.storeId) {
             return new NextResponse("Store id is required", { status: 400 });

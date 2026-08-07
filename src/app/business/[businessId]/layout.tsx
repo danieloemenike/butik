@@ -4,19 +4,20 @@ import type { Metadata } from 'next';
 import { redirect, } from 'next/navigation';
 
 export const metadata: Metadata = {
-    title: 'Butik - E-commerce Website',
-  description: 'The Future of E-commerce',
+    title: 'Butik — Business stores',
+  description: 'Manage storefronts for your business on Butik',
 }
 
 type BusinessProps = {
     children: React.ReactNode
-    params: {
+    params: Promise<{
       
         businessId: string
-    }
+    }>
 }
 
 export default async function BusinessLayout({ children, params }: BusinessProps) {
+    const { businessId } = await params
     const { getUser, isAuthenticated } = getKindeServerSession()
     const userInfo = await getUser()
     const userId = userInfo?.id
@@ -29,7 +30,7 @@ export default async function BusinessLayout({ children, params }: BusinessProps
             where: {
              
                 userId,
-                id: params?.businessId
+                id: businessId
             }
     
         })

@@ -1,21 +1,17 @@
-import Heading from '@/components/StoreHeading';
-import React from 'react'
-import { CategoryForm } from './_components/CategoryForm'
+import Heading from "@/components/StoreHeading"
+import { CategoryForm } from "./_components/CategoryForm"
 
-
-type Props = {}
-
-export default function page({ }: Props) {
-   
+export default function page() {
   return (
-    <>
-     
-          <Heading title="Create New Category" subtitle="Add a New Store Category" showButton={ false } />
-      <main className="overflow-y-auto">
-      <CategoryForm />
-
-          </main>
-         
-      </>
+    <main className="space-y-1">
+      <Heading
+        title="Create category"
+        subtitle="Add a new product category"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <CategoryForm />
+      </div>
+    </main>
   )
 }

@@ -1,15 +1,26 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Bricolage_Grotesque, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { Providers } from '@/reduxStore/provider'
 import { Toaster } from '@/components/ui/toaster'
 
-const inter = Inter({ subsets: ['latin'] })
+const display = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+const sans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: ' Butik - MultiVendor Ecommerce Platform',
-  description: 'MultiVendor Ecommerce Platform',
+  title: 'Butik — Multi-vendor commerce infrastructure',
+  description:
+    'Operate multiple storefronts, inventories, and storefront APIs from one enterprise commerce platform.',
 }
 
 export default function RootLayout({
@@ -18,19 +29,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={ inter.className }>
-           <Providers>
-      <ThemeProvider
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+      <body className="font-sans antialiased">
+        <Providers>
+          <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
-            { children }
+            {children}
             <Toaster />
           </ThemeProvider>
-          </Providers>
+        </Providers>
       </body>
     </html>
   )

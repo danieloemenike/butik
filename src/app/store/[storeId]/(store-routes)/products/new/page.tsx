@@ -1,29 +1,24 @@
+import { ProductForm } from "./_components/ProductForm"
+import Heading from "@/components/StoreHeading"
+import prismadb from "@/lib/prismadb"
 
-import React from 'react'
-
-import { ProductForm } from './_components/ProductForm'
-import Heading from '@/components/StoreHeading'
-import prismadb from '@/lib/prismadb'
-
-
-type Props = {}
-
-export default async function page({ }: Props) {
+export default async function page() {
   const categories = await prismadb.category.findMany({
     include: {
-       subcategories: true
-     }
+      subcategories: true,
+    },
   })
- 
+
   return (
-    <>
-     
-          <Heading title="Create Your Store's Product Here" subtitle="Create your products " showButton={ false } />
-      <main className="">
-   
-        <ProductForm categories={ categories } />
-          </main>
-         
-      </>
+    <main className="space-y-1">
+      <Heading
+        title="Create product"
+        subtitle="Add a new item to your store catalog"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <ProductForm categories={categories} />
+      </div>
+    </main>
   )
 }

@@ -15,9 +15,10 @@ type TProductVariantSchema = {
 
 export async function POST(
 	req: Request,
-	{ params }: { params: { storeId: string } }
+	{ params: rawParams }: { params: Promise<{ storeId: string }> }
 ) {
 	try {
+		const params = await rawParams;
 		const { getUser, isAuthenticated } = getKindeServerSession();
 
 		const userInfo = await getUser();
@@ -344,9 +345,10 @@ export async function POST(
 
 export async function GET(
 	req: Request,
-	{ params }: { params: { storeId: string } }
+	{ params: rawParams }: { params: Promise<{ storeId: string }> }
 ) {
 	try {
+		const params = await rawParams;
 		const { searchParams } = new URL(req.url);
 		const categoryId = searchParams.get("categoryId") || undefined;
 		const colorId = searchParams.get("colorId") || undefined;

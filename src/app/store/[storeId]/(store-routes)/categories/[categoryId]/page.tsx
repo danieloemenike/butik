@@ -1,20 +1,17 @@
-import Heading from '@/components/StoreHeading';
-import React from 'react'
-import { EditCategoryForm } from './_component/EditCategoryData'
+import Heading from "@/components/StoreHeading"
+import { EditCategoryForm } from "./_component/EditCategoryData"
 
-type Props = {}
-
-function page({}: Props) {
+export default function page() {
   return (
-    <main>
-
-<Heading title="Edit Category" subtitle="Edit Category" showButton={ false } />
-      <div className="overflow-y-auto">
-      <EditCategoryForm />
-
-          </div>
+    <main className="space-y-1">
+      <Heading
+        title="Edit category"
+        subtitle="Update category details"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <EditCategoryForm />
+      </div>
     </main>
   )
 }
-
-export default page

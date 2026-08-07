@@ -1,62 +1,457 @@
-import React from "react";
-
+import { RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components"
 import {
-	RegisterLink,
-} from "@kinde-oss/kinde-auth-nextjs/components";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-function Hero() {
-	return (
-		<section className="grid md:grid-cols-2 grid-cols-1 h-[87dvh] container md:px-8 gap-2">
-			<div className=" w-[100%] h-full ">
-				<h1 className="md:text-[3rem] text-[2rem]  font-bold md:mt-[115px] tracking-tighter mt-[35px] md:tracking-loose text-black/90 dark:text-white">
-					{" "}
-					Your{" "}
-					<span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-black to-fuchsia-500 dark:bg-gradient-to-r dark:from-indigo-500 dark:to-fuchsia-500">
-						{" "}
-						E-Commerce{" "}
-					</span>{" "}
-					Success Partner
-				</h1>
-				<div className=" pr-4">
-					<p className="text-muted-foreground dark:text-slate-300 mt-[15px] md:text-lg text-sm leading-loose p-1 ">
-						Here in butik, we empower businesses of all sizes to thrive in the
-						digital marketplace. From{" "}
-						<span className="underline decoration-indigo-600 underline-offset-4">
-							customizable storefronts{" "}
-						</span>{" "}
-						to secure payment processing and powerful analytics. Join thousands
-						of entrepreneurs and experience the future of e-commerce today.
-					</p>
-				</div>
+  ArrowLeftRight,
+  ArrowUpRight,
+  Home,
+  ImageIcon,
+  Package,
+  Palette,
+  PanelLeft,
+  Receipt,
+  Ruler,
+  ShoppingBag,
+  Sparkles,
+  Store,
+  Tags,
+  Wallet,
+} from "lucide-react"
+import { ButikLogo } from "@/components/ButikLogo"
 
-				<div className="md:mt-[15px] mt-[7px] w-fit flex items-center">
-					<Button className="rounded shadow-2xl bg-primary">
-					
-					
-					<RegisterLink>
-						<h2 className=" font-bold mr-[4px] text-primary-foreground ">
-							{" "}
-							Explore butik{" "}
-						</h2>
-						</RegisterLink>
-						</Button>
-				</div>
-			</div>
+const sidebarSections = [
+  {
+    label: "Overview",
+    items: [{ title: "Dashboard", icon: Home, active: true }],
+  },
+  {
+    label: "Catalog",
+    items: [{ title: "Products", icon: Package, active: false }],
+  },
+  {
+    label: "Images",
+    items: [{ title: "Billboards", icon: ImageIcon, active: false }],
+  },
+  {
+    label: "Attributes",
+    items: [
+      { title: "Categories", icon: Tags, active: false },
+      { title: "Colors", icon: Palette, active: false },
+      { title: "Sizes", icon: Ruler, active: false },
+    ],
+  },
+]
 
-			<div className=" h-[100%]  md:w-[90%] flex items-center justify-center">
-				<Image
-					src="/webshop.svg"
-					alt="ecommerce image"
-					className="object-contain"
-					priority
-					width={500}
-					height={500}
-					
-				/>
-			</div>
-		</section>
-	);
+const metrics = [
+  {
+    title: "Total revenue",
+    value: "₦128,440",
+    hint: "Gross sales",
+    icon: Wallet,
+  },
+  {
+    title: "Sales",
+    value: "248",
+    hint: "Completed orders",
+    icon: ShoppingBag,
+  },
+  {
+    title: "In stock",
+    value: "96",
+    hint: "Live products",
+    icon: Package,
+  },
+  {
+    title: "Avg. order",
+    value: "₦518",
+    hint: "Per completed sale",
+    icon: Receipt,
+  },
+]
+
+const barHeights = [38, 55, 42, 70, 48, 82, 60, 74, 52, 88, 66, 78]
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+]
+
+const quickActions = [
+  { label: "Products", description: "Manage catalog", icon: Package },
+  { label: "Billboards", description: "Update imagery", icon: ImageIcon },
+  { label: "Categories", description: "Organize taxonomy", icon: Tags },
+  { label: "Colors", description: "Define swatches", icon: Palette },
+]
+
+const catalogStats = [
+  { label: "Products", value: "96", icon: Package },
+  { label: "Featured", value: "12", icon: Sparkles },
+  { label: "Categories", value: "8", icon: Tags },
+  { label: "Billboards", value: "4", icon: ImageIcon },
+  { label: "Colors", value: "14", icon: Palette },
+  { label: "Sizes", value: "9", icon: Ruler },
+]
+
+const recentProducts = [
+  { name: "Canvas Tote", category: "Bags", price: "₦18,500", tone: "bg-teal-soft" },
+  { name: "Linen Shirt", category: "Apparel", price: "₦24,000", tone: "bg-secondary" },
+  { name: "Studio Cap", category: "Accessories", price: "₦9,200", tone: "bg-muted" },
+]
+
+function DashboardMock() {
+  return (
+    <div className="motion-safe:animate-dash-enter flex h-full w-full overflow-hidden rounded-t-xl border border-ink/10 bg-background shadow-[0_40px_120px_-28px_rgba(12,18,25,0.28)] [animation-delay:180ms] dark:border-white/10 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] lg:rounded-tl-xl lg:rounded-tr-none">
+      <div className="motion-safe:animate-dash-float flex h-full w-full [animation-delay:1.1s]">
+      {/* Sidebar — mirrors AppSidebar */}
+      <aside className="motion-safe:animate-dash-fade-up hidden w-[168px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar [animation-delay:320ms] md:flex">
+        <div className="flex h-12 items-center px-3">
+          <p className="font-display text-sm font-semibold tracking-tighter text-sidebar-foreground">
+            BUTIK
+          </p>
+        </div>
+
+        <div className="px-2 pb-2">
+          <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/60 px-2 py-1.5">
+            <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-teal-soft text-teal">
+              <Store className="h-3 w-3" strokeWidth={1.75} />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-semibold tracking-tight text-sidebar-foreground">
+                North Atelier
+              </p>
+              <p className="text-[9px] text-muted-foreground">Active store</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="min-h-0 flex-1 space-y-3 overflow-hidden px-2 pb-2">
+          {sidebarSections.map((section) => (
+            <div key={section.label} className="space-y-0.5">
+              <p className="px-2 py-1 text-[9px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+                {section.label}
+              </p>
+              {section.items.map((item) => {
+                const Icon = item.icon
+                return (
+                  <div
+                    key={item.title}
+                    className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] ${
+                      item.active
+                        ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/75"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-3.5 w-3.5 shrink-0 ${
+                        item.active ? "motion-safe:animate-dash-soft-pulse text-teal" : ""
+                      }`}
+                      strokeWidth={1.6}
+                    />
+                    <span className="truncate">{item.title}</span>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </nav>
+
+        <div className="border-t border-sidebar-border px-2 py-2">
+          <div className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] text-sidebar-foreground/75">
+            <ArrowLeftRight className="h-3.5 w-3.5" strokeWidth={1.6} />
+            Switch store
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col bg-background">
+        {/* Inset header — mirrors StoreInsetHeader */}
+        <div className="motion-safe:animate-dash-fade-up flex h-11 shrink-0 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur-md [animation-delay:380ms] sm:px-4">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground">
+            <PanelLeft className="h-3.5 w-3.5" strokeWidth={1.6} />
+          </span>
+          <span className="hidden h-4 w-px bg-border sm:block" />
+          <div className="min-w-0 flex-1" />
+          <span className="h-2.5 w-2.5 rounded-full border border-border" />
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-teal text-[9px] font-semibold text-white dark:text-surface-deep">
+            NA
+          </span>
+          <span className="hidden text-[10px] font-medium text-muted-foreground sm:inline">
+            Logout
+          </span>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4">
+          <header className="motion-safe:animate-dash-fade-up mb-3 [animation-delay:420ms]">
+            <h3 className="font-display text-[15px] font-medium tracking-tight text-foreground sm:text-base">
+              Dashboard
+            </h3>
+            <p className="text-[10px] text-muted-foreground sm:text-[11px]">
+              Store performance at a glance
+            </p>
+          </header>
+
+          <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+            {metrics.map((metric, index) => {
+              const Icon = metric.icon
+              return (
+                <div
+                  key={metric.title}
+                  className="motion-safe:animate-dash-fade-up rounded-xl border border-border bg-card px-2.5 py-2.5 sm:px-3 sm:py-3"
+                  style={{ animationDelay: `${480 + index * 70}ms` }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-[9px] font-medium text-muted-foreground sm:text-[10px]">
+                        {metric.title}
+                      </p>
+                      <p className="mt-1 font-display text-sm font-medium tracking-tight text-foreground sm:text-[15px]">
+                        {metric.value}
+                      </p>
+                      <p className="mt-0.5 hidden text-[9px] text-muted-foreground sm:block">
+                        {metric.hint}
+                      </p>
+                    </div>
+                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-teal-soft text-teal">
+                      <Icon className="h-3.5 w-3.5" strokeWidth={1.6} />
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="mt-2.5 grid gap-2 sm:mt-3 lg:grid-cols-[1.7fr_1fr]">
+            <div className="motion-safe:animate-dash-fade-up rounded-xl border border-border bg-card p-2.5 [animation-delay:760ms] sm:p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div>
+                  <p className="font-display text-xs font-medium tracking-tight text-foreground sm:text-[13px]">
+                    Revenue overview
+                  </p>
+                  <p className="hidden text-[9px] text-muted-foreground sm:block">
+                    Monthly totals for this year
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-[2px] bg-teal" />
+                  Revenue
+                </span>
+              </div>
+
+              <div className="relative h-[88px] sm:h-[108px]">
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-1 bottom-4 flex flex-col justify-between"
+                >
+                  {[0, 1, 2].map((line) => (
+                    <div
+                      key={line}
+                      className="border-t border-dashed border-border/70"
+                    />
+                  ))}
+                </div>
+                <div className="absolute inset-x-0 top-1 bottom-4 flex items-end gap-1 px-0.5 sm:gap-1.5">
+                  {barHeights.map((height, index) => (
+                    <div
+                      key={months[index]}
+                      className="flex min-w-0 flex-1 flex-col items-center justify-end"
+                    >
+                      <div
+                        className="motion-safe:animate-dash-bar w-full max-w-[11px] origin-bottom rounded-t-[3px] bg-teal"
+                        style={{
+                          height: `${height}%`,
+                          animationDelay: `${820 + index * 45}ms`,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute inset-x-0 bottom-0 flex justify-between">
+                  {months.map((month, index) => (
+                    <span
+                      key={month}
+                      className={`flex-1 text-center text-[7px] text-muted-foreground ${
+                        index % 2 === 1 ? "hidden sm:inline" : ""
+                      }`}
+                    >
+                      {month}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="motion-safe:animate-dash-fade-up hidden rounded-xl border border-border bg-card p-3 [animation-delay:840ms] lg:block">
+              <p className="font-display text-[13px] font-medium tracking-tight text-foreground">
+                Quick actions
+              </p>
+              <p className="mb-2 text-[9px] text-muted-foreground">
+                Common store workflows
+              </p>
+              <div className="space-y-1.5">
+                {quickActions.map((action, index) => {
+                  const Icon = action.icon
+                  return (
+                    <div
+                      key={action.label}
+                      className="motion-safe:animate-dash-fade-up flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2 py-1.5"
+                      style={{ animationDelay: `${900 + index * 60}ms` }}
+                    >
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-border bg-card text-muted-foreground">
+                        <Icon className="h-3 w-3" strokeWidth={1.6} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[10px] font-semibold text-foreground">
+                          {action.label}
+                        </span>
+                        <span className="block text-[8px] text-muted-foreground">
+                          {action.description}
+                        </span>
+                      </span>
+                      <ArrowUpRight className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-2.5 hidden gap-2 sm:mt-3 sm:grid lg:grid-cols-2">
+            <div className="motion-safe:animate-dash-fade-up rounded-xl border border-border bg-card p-3 [animation-delay:980ms]">
+              <p className="font-display text-[13px] font-medium tracking-tight text-foreground">
+                Catalog snapshot
+              </p>
+              <p className="mb-2 text-[9px] text-muted-foreground">
+                Inventory and attribute coverage
+              </p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {catalogStats.map((stat) => {
+                  const Icon = stat.icon
+                  return (
+                    <div
+                      key={stat.label}
+                      className="rounded-lg border border-border bg-muted/25 px-2 py-2"
+                    >
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Icon className="h-2.5 w-2.5" strokeWidth={1.6} />
+                        <span className="truncate text-[8px] font-medium">
+                          {stat.label}
+                        </span>
+                      </div>
+                      <p className="mt-1 font-display text-sm font-medium tracking-tight text-foreground">
+                        {stat.value}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="motion-safe:animate-dash-fade-up rounded-xl border border-border bg-card p-3 [animation-delay:1040ms]">
+              <div className="mb-2 flex items-center justify-between">
+                <div>
+                  <p className="font-display text-[13px] font-medium tracking-tight text-foreground">
+                    Recent products
+                  </p>
+                  <p className="text-[9px] text-muted-foreground">
+                    Latest additions to your catalog
+                  </p>
+                </div>
+                <span className="text-[9px] font-medium text-teal">View all</span>
+              </div>
+              <ul className="divide-y divide-border">
+                {recentProducts.map((product, index) => (
+                  <li
+                    key={product.name}
+                    className="motion-safe:animate-dash-fade-up flex items-center gap-2 py-2 first:pt-0 last:pb-0"
+                    style={{ animationDelay: `${1100 + index * 70}ms` }}
+                  >
+                    <span
+                      className={`flex h-8 w-8 items-center justify-center rounded-md border border-border ${product.tone}`}
+                    >
+                      <Package
+                        className="h-3.5 w-3.5 text-muted-foreground"
+                        strokeWidth={1.6}
+                      />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[11px] font-semibold text-foreground">
+                        {product.name}
+                      </p>
+                      <p className="truncate text-[9px] text-muted-foreground">
+                        {product.category}
+                      </p>
+                    </div>
+                    <p className="text-[10px] font-medium text-foreground">
+                      {product.price}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  )
 }
 
-export default Hero;
+function HeroBackdrop() {
+  return (
+    <div className="absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="landing-hero-bg absolute inset-0 animate-landing-pan" />
+      <div className="landing-grid absolute inset-0 opacity-50 dark:opacity-35" />
+      <div className="landing-grain absolute inset-0 z-[1]" />
+
+      <div className="absolute inset-x-0 bottom-[-8%] top-[28%] px-4 sm:px-8 lg:left-[42%] lg:right-[-4%] lg:top-[14%] lg:bottom-[-14%] lg:px-0">
+        <DashboardMock />
+      </div>
+
+      <div className="landing-hero-veil absolute inset-0" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-surface-raised to-transparent lg:hidden dark:from-[#0c1219]/80" />
+    </div>
+  )
+}
+
+function Hero() {
+  return (
+    <section className="relative isolate min-h-[100svh] overflow-hidden bg-surface-raised text-ink">
+      <HeroBackdrop />
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 sm:px-8 md:justify-center md:pb-24 md:pt-24">
+        <div className="max-w-xl">
+          <div className="animate-landing-fade-up">
+            <ButikLogo href={null} size="xl" className="text-ink" />
+          </div>
+          <h1 className="animate-landing-fade-up mt-6 max-w-[16ch] font-display text-[clamp(1.55rem,3.2vw,2.2rem)] leading-[1.18] font-medium tracking-[-0.03em] text-ink-soft [animation-delay:110ms]">
+            Multi-vendor commerce infrastructure for operators who scale.
+          </h1>
+          <p className="animate-landing-fade-up mt-5 max-w-[34ch] text-base leading-relaxed text-ink-muted sm:text-lg [animation-delay:190ms]">
+            Launch storefronts, manage catalogs, and ship store-scoped APIs from
+            one control plane built for enterprise operations.
+          </p>
+          <div className="animate-landing-fade-up mt-8 flex flex-wrap items-center gap-3 [animation-delay:270ms]">
+            <RegisterLink className="inline-flex h-12 items-center rounded-md bg-ink px-6 text-sm font-semibold text-surface-raised transition-opacity hover:opacity-90">
+              Start building
+            </RegisterLink>
+            <a
+              href="#platform"
+              className="inline-flex h-12 items-center rounded-md border border-ink/15 px-5 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/5"
+            >
+              Explore platform
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default Hero

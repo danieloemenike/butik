@@ -2,8 +2,10 @@ import prismadb from "@/lib/prismadb";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request, { params }: { params: { storeId: string, billboardId: string } }) {
+export async function GET(req: Request, { params: rawParams }: { params: Promise<{ storeId: string, billboardId: string }> }) {
     try {
+        const params = await rawParams;
+    
     
         if (!params.billboardId) {
             return new NextResponse("Billboard id is required", { status: 400 });
@@ -41,9 +43,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string,
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { billboardId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ billboardId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()
@@ -94,9 +97,10 @@ export async function DELETE(
   
   export async function PATCH(
     req: Request,
-    { params }: { params: { billboardId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ billboardId: string, storeId: string }> }
   ) {
     try {   
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()

@@ -35,7 +35,7 @@ type BillboardFormValues = z.infer<typeof formSchema>
 
 export const BillboardForm = () => {
   const params = useParams();
-  const {storeId} = params
+  const storeId = String(params.storeId ?? "");
     const router = useRouter();
     const [addBillboard,{isLoading,isError, isSuccess}] = useAddBillboardMutation();
 const initialData = false

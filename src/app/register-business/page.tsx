@@ -21,7 +21,14 @@ function RegisterBusiness({}: Props) {
               <BusinessForm />
           </div>
           <div className="  lg:flex items-center justify-center hidden ">
-              <Image width={ 500 } height={ 500} className="object-fit" src="/shopping.svg" alt="shopping image"/>
+              <Image
+                width={500}
+                height={500}
+                className="h-auto w-full max-w-[500px] object-contain"
+                src="/shopping.svg"
+                alt="shopping image"
+                priority
+              />
           </div>
           </div>
         </section>

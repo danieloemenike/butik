@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
 
 import CellAction from "./cellAction";
 import Image from "next/image";
@@ -22,7 +22,7 @@ type ProductData = {
     }
 
     
-    export const columns: ColumnDef<ProductData>[] = [
+    export const columns: ColumnDef<ProductData, unknown>[] = [
         {
           accessorKey: "name",
           header: "Name",

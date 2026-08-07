@@ -7,18 +7,19 @@ import { NextResponse } from "next/server";
 
 export async function GET(
     req: Request,
-    { params }: { params: { sizeId: string, storeId?: string } }
+    { params: rawParams }: { params: Promise<{ colorId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
      
-      if (!params.sizeId) {
+      if (!params.colorId) {
         return new NextResponse("color id is required", { status: 400 });
         }
      
   
       const color = await prismadb.color.findUnique({
         where: {
-              id: params.sizeId,
+              id: params.colorId,
             
           }
       });
@@ -32,9 +33,10 @@ export async function GET(
   
   export async function DELETE(
     req: Request,
-    { params }: { params: { sizeId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ colorId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()
@@ -49,7 +51,7 @@ export async function GET(
             return new NextResponse("UnAuthorized", {status: 403})
         }
   
-      if (!params.sizeId) {
+      if (!params.colorId) {
         return new NextResponse("color id is required", { status: 400 });
         }
         
@@ -62,7 +64,7 @@ export async function GET(
   
       const color = await prismadb.color.delete({
         where: {
-              id: params.sizeId,
+              id: params.colorId,
          
         }
       });
@@ -81,9 +83,10 @@ export async function GET(
   
   export async function PATCH(
     req: Request,
-    { params }: { params: { sizeId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ colorId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()
@@ -112,7 +115,7 @@ export async function GET(
       }
   
   
-      if (!params.sizeId) {
+      if (!params.colorId) {
         return new NextResponse("color id is required", { status: 400 });
       }
   
@@ -129,7 +132,7 @@ export async function GET(
   
       const color = await prismadb.color.update({
         where: {
-          id: params.sizeId
+          id: params.colorId
         },
         data: {
           name,

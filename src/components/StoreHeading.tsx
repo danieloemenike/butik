@@ -1,40 +1,44 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import React from "react"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 
 type Props = {
-	title: string;
-	subtitle: string;
-	handleClick?: () => void;
-	text?: string;
-	showButton: boolean;
-	plusIcon?: boolean;
-};
-
-function Heading({
-	title,
-	subtitle,
-	handleClick,
-	text,
-	showButton,
-	plusIcon,
-}: Props) {
-	return (
-		<>
-			<header className="flex items-center justify-between mt-6 mb-4 border-b-2 border-b-primary pb-3 px-4">
-				<div>
-					<h2 className="text-[23px] font-bold tracking-tighter capitalize"> {title} </h2>
-					<p className="hidden md:block text-[16px] text-muted-foreground"> {subtitle}</p>
-				</div>
-				{showButton && (
-					<Button onClick={handleClick} variant="default">
-						{text}
-						{plusIcon && <Plus className="mr-2 h-4 w-4" />}
-					</Button>
-				)}
-			</header>
-		</>
-	);
+  title: string
+  subtitle: string
+  handleClick?: () => void
+  text?: string
+  showButton: boolean
+  plusIcon?: boolean
 }
 
-export default Heading;
+function Heading({
+  title,
+  subtitle,
+  handleClick,
+  text,
+  showButton,
+  plusIcon,
+}: Props) {
+  return (
+    <header className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="font-display text-[1.5rem] font-medium tracking-tight text-foreground capitalize md:text-[1.7rem]">
+          {title}
+        </h1>
+        <p className="mt-1 max-w-xl text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+      {showButton ? (
+        <Button
+          onClick={handleClick}
+          size="sm"
+          className="self-start font-semibold sm:self-auto"
+        >
+          {plusIcon ? <Plus className="mr-1.5 h-4 w-4" strokeWidth={1.75} /> : null}
+          {text}
+        </Button>
+      ) : null}
+    </header>
+  )
+}
+
+export default Heading

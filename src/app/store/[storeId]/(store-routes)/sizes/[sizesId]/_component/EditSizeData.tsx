@@ -38,7 +38,8 @@ type BillboardFormValues = z.infer<typeof formSchema>
 export const EditSizeForm = () => {
   
   const params = useParams();
-  const {storeId, sizesId} = params
+  const storeId = String(params.storeId ?? "");
+  const sizesId = String(params.sizesId ?? "");
     const router = useRouter();
 
   const { data: initialData, isSuccess: gottenData } = useGetSizeQuery({ storeId, sizeId: sizesId })
@@ -67,7 +68,7 @@ export const EditSizeForm = () => {
     try {
       setLoading(true);
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
-        await updateSize({ storeId: params.storeId, sizeId: params.sizesId, updatedData: data })
+        await updateSize({ storeId, sizeId: sizesId, updatedData: data })
         console.log("success")
       router.refresh();
       router.push(`/store/${storeId}/sizes`);
@@ -82,7 +83,7 @@ export const EditSizeForm = () => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await deleteSize({ storeId: params.storeId, sizeId: params.sizesId })
+      await deleteSize({ storeId, sizeId: sizesId })
       router.refresh();
       router.push(`/store/${storeId}/sizes`);
     } catch (error: any) {

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash, TrashIcon } from "lucide-react";
 import {
@@ -120,6 +121,7 @@ type ProductProps = {
 export const ProductForm = ({ categories }: ProductProps) => {
 	const { toast } = useToast();
 	const params = useParams();
+	const storeId = String(params.storeId ?? "");
 	const router = useRouter();
 
 	const [open, setOpen] = useState(false);
@@ -137,7 +139,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 		isFetching: isColorFetching,
 		isSuccess: isColorSuccessful,
 		isError: isColorError,
-	} = useGetColorsQuery(`${params.storeId}`, {
+	} = useGetColorsQuery(storeId, {
 		refetchOnMountOrArgChange: true,
 	});
 
@@ -148,7 +150,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 		isFetching: isSizeFetching,
 		isSuccess: isSizeSuccessful,
 		isError: isSizeError,
-	} = useGetSizesQuery(`${params.storeId}`, {
+	} = useGetSizesQuery(storeId, {
 		refetchOnMountOrArgChange: true,
 	});
 
@@ -179,7 +181,7 @@ export const ProductForm = ({ categories }: ProductProps) => {
 	};
 
 	const form = useForm<ProductFormValues>({
-		resolver: zodResolver(formSchema),
+		resolver: zodResolver(formSchema) as Resolver<ProductFormValues>,
 		defaultValues,
 	});
 	
@@ -279,7 +281,7 @@ const [businessSlugDisplay, setBusinessSlugDisplay] = useState('');
 		try {
 			// await addProduct({ storeId: params.storeId, data }).unwrap();
 			const response = await axios.post(
-				`/api/${params.storeId}/products/v1`,
+				`/api/${storeId}/products/v1`,
 				data
 			);
 			if (response) {
@@ -287,7 +289,7 @@ const [businessSlugDisplay, setBusinessSlugDisplay] = useState('');
 				toast({
 					description: "Your Product has been created successfully.",
 				});
-				router.push(`/store/${params.storeId}/products`);
+				router.push(`/store/${storeId}/products`);
 			} else {
 				toast({
 					variant: "destructive",

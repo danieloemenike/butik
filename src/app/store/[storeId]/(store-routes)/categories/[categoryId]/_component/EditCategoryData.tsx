@@ -36,9 +36,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 
 const formSchema = z.object({
   name: z.string().min(1), 
-  billboardId: z.string({
-    required_error: "Please select a language.",
-  }),
+  billboardId: z.string().min(1, "Please select a language."),
 });
 
 type BillboardFormValues = z.infer<typeof formSchema>
@@ -51,7 +49,8 @@ export const EditCategoryForm = () => {
 
 
   const params = useParams();
-  const {storeId, categoryId} = params
+  const storeId = String(params.storeId ?? "");
+  const categoryId = String(params.categoryId ?? "");
   const router = useRouter();
   
   //API CALLS
@@ -86,7 +85,7 @@ export const EditCategoryForm = () => {
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
       // await updateBillboard({ storeId: params.storeId, billboardId: params.billboardId, updatedData: data })
       
-      await updateCategory({ storeId: params.storeId, categoryId: params.categoryId, updatedData: data })
+      await updateCategory({ storeId, categoryId, updatedData: data })
       
       router.refresh();
       router.push(`/store/${storeId}/categories`);
@@ -103,7 +102,7 @@ export const EditCategoryForm = () => {
       setLoading(true);
       // await deleteBillboard({ storeId: params.storeId, billboardId: params.billboardId })
       // router.refresh();
-      await deleteCategory({ storeId: params.storeId, categoryId: params.categoryId })
+      await deleteCategory({ storeId, categoryId })
       router.refresh();
       router.push(`/store/${storeId}/categories`);
       console.log('Category deleted.');

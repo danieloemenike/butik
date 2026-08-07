@@ -1,22 +1,17 @@
+import Heading from "@/components/StoreHeading"
+import { BillboardForm } from "./_components/BillboardForm"
 
-import Heading from '@/components/StoreHeading';
-import React from 'react'
-import { BillboardForm } from './_components/BillboardForm'
-
-
-type Props = {}
-
-export default function NewBillboard({ }: Props) {
-   
+export default function NewBillboard() {
   return (
-    <>
-     
-          {/* <Heading title="Create New Billboard" subtitle="Add a new billboard" showButton={ false } /> */}
-      <main className="overflow-y-auto">
-      <BillboardForm />
-
-          </main>
-         
-      </>
+    <main className="space-y-1">
+      <Heading
+        title="Create billboard"
+        subtitle="Add a new storefront banner"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <BillboardForm />
+      </div>
+    </main>
   )
 }

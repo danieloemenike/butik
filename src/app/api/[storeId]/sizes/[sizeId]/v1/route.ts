@@ -7,9 +7,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
     req: Request,
-    { params }: { params: { sizeId: string, storeId?: string } }
+    { params: rawParams }: { params: Promise<{ sizeId: string, storeId?: string }> }
   ) {
     try {
+      const params = await rawParams;
       
       if (!params.sizeId) {
         return new NextResponse("Size id is required", { status: 400 });
@@ -32,9 +33,10 @@ export async function GET(
   
   export async function DELETE(
     req: Request,
-    { params }: { params: { sizeId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ sizeId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()
@@ -90,9 +92,10 @@ export async function GET(
   
   export async function PATCH(
     req: Request,
-    { params }: { params: { sizeId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ sizeId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()

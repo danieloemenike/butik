@@ -38,7 +38,7 @@ type BillboardFormValues = z.infer<typeof formSchema>
 export const NewColorForm = () => {
   
   const params = useParams();
-  const {storeId, colorId} = params
+  const storeId = String(params.storeId ?? "");
     const router = useRouter();
     const [addColor,{isLoading,isError, isSuccess}] = useAddColorMutation();
  
@@ -57,7 +57,7 @@ export const NewColorForm = () => {
     try {
       setLoading(true);
       //await axios.post(`/api/${params.storeId}/billboard/v1`, data);
-      await addColor({ storeId: params.storeId, data }).unwrap();
+      await addColor({ storeId, data }).unwrap();
         console.log("success")
       router.refresh();
       router.push(`/store/${storeId}/colors`);

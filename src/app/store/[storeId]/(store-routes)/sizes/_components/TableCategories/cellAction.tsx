@@ -39,6 +39,7 @@ interface CellActionProps {
    const {toast} = useToast()
   const router = useRouter();
   const params = useParams();
+  const storeId = String(params.storeId ?? "");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
    const [deleteSize, {isLoading, isError, isSuccess, }] = useDeleteSizeMutation();
@@ -47,7 +48,7 @@ interface CellActionProps {
     try {
       setLoading(true);
       
-      await deleteSize({ storeId: params.storeId, sizeId: data.id})
+      await deleteSize({ storeId, sizeId: data.id})
       
       if (isSuccess) return
       toast({
@@ -83,7 +84,7 @@ interface CellActionProps {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
   
           <DropdownMenuItem
-            onClick={() => router.push(`/store/${params.storeId}/sizes/${data.id}`)}
+            onClick={() => router.push(`/store/${storeId}/sizes/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

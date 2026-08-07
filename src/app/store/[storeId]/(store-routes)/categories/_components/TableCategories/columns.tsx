@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CellAction from "./cellAction";
@@ -19,7 +19,7 @@ type categoryDataInfo = {
 
     
  const columnHelper = createColumnHelper<categoryDataInfo>()
- const columns : ColumnDef<categoryDataInfo, string>[] = [
+ const columns : ColumnDef<categoryDataInfo, any>[] = [
         columnHelper.accessor('name', {
             header: ({column}) => {
             return (

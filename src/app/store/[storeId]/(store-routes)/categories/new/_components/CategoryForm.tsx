@@ -37,9 +37,7 @@ import { Category } from "@prisma/client"
 
 const formSchema = z.object({
   name: z.string().min(1), 
-  billboardId: z.string({
-    required_error: "Please select a language.",
-  }),
+  billboardId: z.string().min(1, "Please select a language."),
 });
 
 type CategoryFormValues = z.infer<typeof formSchema>
@@ -57,7 +55,7 @@ type CategoryData = {
 }[]
 export const CategoryForm = () => {
   const params = useParams();
-  const {storeId} = params
+  const storeId = String(params.storeId ?? "");
   const router = useRouter();
   
   const [addCategory, { isLoading, isError, isSuccess }] = useAddCategoryMutation();

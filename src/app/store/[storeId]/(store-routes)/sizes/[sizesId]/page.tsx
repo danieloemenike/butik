@@ -1,21 +1,17 @@
+import { EditSizeForm } from "./_component/EditSizeData"
+import Heading from "@/components/StoreHeading"
 
-import React from 'react'
-import { EditSizeForm } from './_component/EditSizeData'
-import Heading from '@/components/StoreHeading'
-
-type Props = {}
-
-function page({}: Props) {
+export default function page() {
   return (
-    <main>
-
-<Heading title="Edit Sizes" subtitle="Edit Sizes" showButton={ false } />
-      <div className="overflow-y-auto">
-      <EditSizeForm />
-
-          </div>
+    <main className="space-y-1">
+      <Heading
+        title="Edit size"
+        subtitle="Update size option details"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <EditSizeForm />
+      </div>
     </main>
   )
 }
-
-export default page

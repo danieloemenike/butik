@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CellAction from "./cellAction";
@@ -19,7 +19,7 @@ type sizeDataInfo = {
 
     
  const columnHelper = createColumnHelper<sizeDataInfo>()
- const columns : ColumnDef<sizeDataInfo, string>[] = [
+ const columns : ColumnDef<sizeDataInfo, any>[] = [
         columnHelper.accessor('name', {
             header: ({column}) => {
             return (

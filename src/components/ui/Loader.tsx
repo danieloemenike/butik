@@ -1,18 +1,33 @@
-"use client"
-import { Dna } from "react-loader-spinner";
+import { ButikLogo } from "@/components/ButikLogo"
+import { cn } from "@/lib/utils"
 
-export default function Loader() {
-    // You can add any UI inside Loading, including a Skeleton.
-    return (
-        <div className = "h-[70dvh] flex items-center justify-center">
-        <Dna
-            visible={true}
-            height="180"
-            width="180"
-            ariaLabel="dna-loading"
-            wrapperStyle={{}}
-            wrapperClass="dna-wrapper"
-        />
-</div>
-    )
-  }
+type LoaderProps = {
+  className?: string
+  fullScreen?: boolean
+  size?: "sm" | "md" | "lg" | "xl"
+}
+
+export default function Loader({
+  className,
+  fullScreen = false,
+  size = "lg",
+}: LoaderProps) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading"
+      className={cn(
+        "flex items-center justify-center",
+        fullScreen ? "min-h-screen w-full bg-background" : "h-[70dvh] w-full",
+        className
+      )}
+    >
+      <ButikLogo
+        href={null}
+        size={size}
+        className="animate-logo-breathe"
+      />
+      <span className="sr-only">Loading…</span>
+    </div>
+  )
+}

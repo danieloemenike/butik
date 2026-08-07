@@ -1,20 +1,17 @@
-import Heading from '@/components/StoreHeading';
-import React from 'react'
-import { EditBillboardForm } from './_component/EditBillBoard'
+import Heading from "@/components/StoreHeading"
+import { EditBillboardForm } from "./_component/EditBillBoard"
 
-type Props = {}
-
-function page({}: Props) {
+export default function page() {
   return (
-    <main>
-
-<Heading title="Edit Billboard" subtitle="Edit Billboard" showButton={ false } />
-      <div className="overflow-y-auto">
-      <EditBillboardForm />
-
-          </div>
+    <main className="space-y-1">
+      <Heading
+        title="Edit billboard"
+        subtitle="Update storefront banner details"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <EditBillboardForm />
+      </div>
     </main>
   )
 }
-
-export default page

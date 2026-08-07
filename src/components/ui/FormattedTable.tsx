@@ -1,62 +1,73 @@
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable,getSortedRowModel, SortingState,ColumnFiltersState,getFilteredRowModel, getPaginationRowModel, ColumnDef,} from "@tanstack/react-table";
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+"use client";
+
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { useMemo, useState } from "react";
+  flexRender,
+  type SortingState,
+  type ColumnFiltersState,
+} from "@tanstack/react-table";
+import {
+  useLegacyTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+} from "@tanstack/react-table/legacy";
+import "react-loading-skeleton/dist/skeleton.css";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 
- type FormattedDataProps<TData, TValue> = {
-    data : TData[],
-   searchKey: string,
-  columns: ColumnDef<TData, TValue>[],
-}
+type FormattedDataProps<TData> = {
+  data: TData[];
+  searchKey: string;
+  columns: any[];
+};
 
-export default function FormattedTable<TData, TValue>({ data, searchKey, columns }: FormattedDataProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+export default function FormattedTable<TData>({
+  data,
+  searchKey,
+  columns,
+}: FormattedDataProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-    
-    const table = useReactTable({
-        data,
-        columns: columns,
-      getCoreRowModel: getCoreRowModel(),
-        //sorting
-        onSortingChange: setSorting,
-      getSortedRowModel: getSortedRowModel(),
-      //filtering
-      onColumnFiltersChange: setColumnFilters,
-      getFilteredRowModel: getFilteredRowModel(),
-      getPaginationRowModel: getPaginationRowModel(),
-      state: {
-        sorting,
-        columnFilters,
-      }
-         
-    })
+  const table = useLegacyTable({
+    data: data as any[],
+    columns: columns as any,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  });
+
   return (
-    <main className = " "> 
-       
-    <div className="flex items-center py-4">
-    <Input
-      placeholder="Filter..."
-      value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-      onChange={(event) =>
-        table.getColumn(searchKey)?.setFilterValue(event.target.value)
-      }
-      className="max-w-sm"
-    />
-  </div>
-        <div className="rounded-md border">
-          
+    <main className=" ">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filter..."
+          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn(searchKey)?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -71,7 +82,7 @@ export default function FormattedTable<TData, TValue>({ data, searchKey, columns
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -85,14 +96,20 @@ export default function FormattedTable<TData, TValue>({ data, searchKey, columns
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -117,8 +134,7 @@ export default function FormattedTable<TData, TValue>({ data, searchKey, columns
         >
           Next
         </Button>
-              </div>
-             
-      </main>
-    )
+      </div>
+    </main>
+  );
 }

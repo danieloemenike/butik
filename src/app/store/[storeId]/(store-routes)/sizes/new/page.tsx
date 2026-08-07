@@ -1,22 +1,17 @@
+import { NewSizeForm } from "./_components/SizeForm"
+import Heading from "@/components/StoreHeading"
 
-import React from 'react'
-import { NewSizeForm } from './_components/SizeForm'
-import Heading from '@/components/StoreHeading'
-
-
-type Props = {}
-
-export default function page({ }: Props) {
-   
+export default function page() {
   return (
-    <>
-     
-          <Heading title="Create New Product Size" subtitle="Add a Product Size" showButton={ false } />
-      <main className="overflow-y-auto">
-      <NewSizeForm />
-
-          </main>
-         
-      </>
+    <main className="space-y-1">
+      <Heading
+        title="Create size"
+        subtitle="Add a product size option"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <NewSizeForm />
+      </div>
+    </main>
   )
 }

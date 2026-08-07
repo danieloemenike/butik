@@ -32,6 +32,7 @@ interface CellActionProps {
    const {toast} = useToast()
   const router = useRouter();
   const params = useParams();
+  const businessId = String(params.businessId ?? "");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
    const [deleteStore, {isLoading, isError, isSuccess, }] = useDeleteStoreMutation();
@@ -40,7 +41,7 @@ interface CellActionProps {
     try {
       setLoading(true);
       
-      await deleteStore({ storeId: data.id, businessId: params.businessId })
+      await deleteStore({ storeId: data.id, businessId })
       
       toast({
         description: "Your store has been deleted successfully.",

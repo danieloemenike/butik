@@ -1,22 +1,17 @@
+import { NewColorForm } from "./_components/ColorForm"
+import Heading from "@/components/StoreHeading"
 
-import React from 'react'
-import { NewColorForm } from './_components/ColorForm'
-import Heading from '@/components/StoreHeading'
-
-
-type Props = {}
-
-export default function page({ }: Props) {
-   
+export default function page() {
   return (
-    <>
-     
-          <Heading title="Create Unique Colors" subtitle="Create Product Colors Here" showButton={ false } />
-      <main className="overflow-y-auto">
-      <NewColorForm />
-
-          </main>
-         
-      </>
+    <main className="space-y-1">
+      <Heading
+        title="Create color"
+        subtitle="Add a product color swatch"
+        showButton={false}
+      />
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+        <NewColorForm />
+      </div>
+    </main>
   )
 }

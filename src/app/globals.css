@@ -1,76 +1,228 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
- 
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+@config "../../tailwind.config.js";
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
+    --background: 210 20% 98%;
+    --foreground: 210 24% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
- 
+    --card-foreground: 210 24% 8%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
- 
-    --primary: 24 9.8% 10%;
-    --primary-foreground: 60 9.1% 97.8%;
- 
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
- 
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
- 
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
- 
+    --popover-foreground: 210 24% 8%;
+
+    --primary: 210 24% 10%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 210 14% 94%;
+    --secondary-foreground: 210 24% 10%;
+
+    --muted: 210 14% 94%;
+    --muted-foreground: 210 8% 42%;
+
+    --accent: 174 58% 28%;
+    --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
 
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20 14.3% 4.1%;
- 
+    --border: 210 14% 88%;
+    --input: 210 14% 88%;
+    --ring: 174 58% 28%;
+
     --radius: 0.5rem;
+
+    --landing-ink: #0c1219;
+    --landing-ink-soft: #1c2733;
+    --landing-ink-muted: #5b6876;
+    --landing-surface: #eef1f4;
+    --landing-surface-raised: #f7f8fa;
+    --landing-surface-deep: #0c1219;
+    --landing-teal: #0f6b63;
+    --landing-teal-soft: #d7ece9;
+    --landing-teal-deep: #0a4540;
+    --landing-hero-from: #f4f7f8;
+    --landing-hero-mid: #e8eef1;
+    --landing-hero-to: #d9ebe8;
+    --landing-hero-glow-a: rgba(15, 107, 99, 0.18);
+    --landing-hero-glow-b: rgba(28, 39, 51, 0.08);
+    --landing-overlay: rgba(247, 248, 250, 0.92);
+    --landing-overlay-mid: rgba(247, 248, 250, 0.72);
+    --landing-grid-line: rgba(12, 18, 25, 0.06);
+    --landing-grain-blend: multiply;
+    --landing-grain-opacity: 0.28;
   }
- 
+
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
- 
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
- 
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
- 
-    --primary: 60 9.1% 97.8%;
-    --primary-foreground: 24 9.8% 10%;
- 
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
- 
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
- 
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
- 
+    --background: 210 24% 7%;
+    --foreground: 210 20% 96%;
+
+    --card: 210 22% 10%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 210 22% 10%;
+    --popover-foreground: 210 20% 96%;
+
+    --primary: 210 20% 96%;
+    --primary-foreground: 210 24% 10%;
+
+    --secondary: 210 16% 16%;
+    --secondary-foreground: 210 20% 96%;
+
+    --muted: 210 16% 16%;
+    --muted-foreground: 210 10% 65%;
+
+    --accent: 174 42% 42%;
+    --accent-foreground: 210 24% 7%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 60 9.1% 97.8%;
- 
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 24 5.7% 82.9%;
+
+    --border: 210 16% 18%;
+    --input: 210 16% 18%;
+    --ring: 174 42% 42%;
+
+    --landing-ink: #f2f5f7;
+    --landing-ink-soft: #d7dee6;
+    --landing-ink-muted: #9aa6b2;
+    --landing-surface: #101820;
+    --landing-surface-raised: #16202a;
+    --landing-surface-deep: #070b10;
+    --landing-teal: #3aa89d;
+    --landing-teal-soft: #143833;
+    --landing-teal-deep: #9ad9d1;
+    --landing-hero-from: #0c1219;
+    --landing-hero-mid: #121c26;
+    --landing-hero-to: #0a3d39;
+    --landing-hero-glow-a: rgba(58, 168, 157, 0.28);
+    --landing-hero-glow-b: rgba(26, 51, 72, 0.45);
+    --landing-overlay: rgba(12, 18, 25, 0.92);
+    --landing-overlay-mid: rgba(12, 18, 25, 0.7);
+    --landing-grid-line: rgba(242, 245, 247, 0.06);
+    --landing-grain-blend: soft-light;
+    --landing-grain-opacity: 0.22;
   }
 }
- 
+
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
+}
+
+@layer components {
+  .landing-shell {
+    color: var(--landing-ink);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, var(--landing-hero-glow-a), transparent 55%),
+      radial-gradient(900px 500px at -5% 20%, var(--landing-hero-glow-b), transparent 50%),
+      linear-gradient(
+        180deg,
+        var(--landing-surface-raised) 0%,
+        var(--landing-surface) 48%,
+        var(--landing-surface-raised) 100%
+      );
+  }
+
+  .app-shell {
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
+  }
+
+  .surface-panel {
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    border-radius: 1rem;
+  }
+
+  .landing-hero-bg {
+    background:
+      radial-gradient(ellipse at 18% 12%, var(--landing-hero-glow-a), transparent 42%),
+      radial-gradient(ellipse at 88% 78%, var(--landing-hero-glow-b), transparent 38%),
+      linear-gradient(
+        145deg,
+        var(--landing-hero-from) 0%,
+        var(--landing-hero-mid) 52%,
+        var(--landing-hero-to) 100%
+      );
+  }
+
+  .landing-hero-veil {
+    background: linear-gradient(
+      to right,
+      var(--landing-overlay) 0%,
+      var(--landing-overlay-mid) 48%,
+      transparent 100%
+    );
+  }
+
+  .landing-grain {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: var(--landing-grain-opacity);
+    mix-blend-mode: var(--landing-grain-blend);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  .landing-grid {
+    background-image:
+      linear-gradient(var(--landing-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--landing-grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-dash-enter,
+  .motion-safe\:animate-dash-fade-up,
+  .motion-safe\:animate-dash-bar,
+  .motion-safe\:animate-dash-float,
+  .motion-safe\:animate-dash-soft-pulse,
+  .animate-landing-fade-up,
+  .animate-landing-pan {
+    animation: none !important;
+  }
+}
+
+/* Sidebar tokens — mapped to Butik ink/teal surfaces */
+:root {
+  --sidebar: hsl(210 20% 98%);
+  --sidebar-foreground: hsl(210 24% 12%);
+  --sidebar-primary: hsl(174 58% 28%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(174 40% 94%);
+  --sidebar-accent-foreground: hsl(174 58% 22%);
+  --sidebar-border: hsl(210 14% 88%);
+  --sidebar-ring: hsl(174 58% 28%);
+}
+
+.dark {
+  --sidebar: hsl(210 22% 9%);
+  --sidebar-foreground: hsl(210 20% 96%);
+  --sidebar-primary: hsl(174 42% 42%);
+  --sidebar-primary-foreground: hsl(210 24% 7%);
+  --sidebar-accent: hsl(174 28% 16%);
+  --sidebar-accent-foreground: hsl(174 40% 72%);
+  --sidebar-border: hsl(210 16% 16%);
+  --sidebar-ring: hsl(174 42% 42%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }

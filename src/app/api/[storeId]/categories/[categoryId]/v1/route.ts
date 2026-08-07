@@ -5,9 +5,10 @@ import prismadb from "@/lib/prismadb";
 
 export async function GET(
   req: Request,
-  { params }: { params: { categoryId: string , storeId?: string} }
+  { params: rawParams }: { params: Promise<{ categoryId: string , storeId?: string}> }
 ) {
     try {
+    const params = await rawParams;
       
 
      
@@ -32,9 +33,10 @@ export async function GET(
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { categoryId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ categoryId: string, storeId: string }> }
   ) {
     try {
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()
@@ -77,9 +79,10 @@ export async function DELETE(
 
   export async function PATCH(
     req: Request,
-    { params }: { params: { categoryId: string, storeId: string } }
+    { params: rawParams }: { params: Promise<{ categoryId: string, storeId: string }> }
   ) {
     try {   
+      const params = await rawParams;
       const { getUser, isAuthenticated } = getKindeServerSession()
     
       const userInfo = await getUser()

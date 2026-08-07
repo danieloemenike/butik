@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import sidebarReducer from "./features/sidebarSlice"
 import { storeApi } from "./services/storeApiSlice";
-import { setupListeners } from "@reduxjs/toolkit/dist/query";
+import { setupListeners } from "@reduxjs/toolkit/query";
 import businessSliceReducer from './features/businessSlice';
 import { billboardApiSlice } from "./services/billboardApiSlice";
 import { categoryApiSlice } from "./services/categoryApiSlice";

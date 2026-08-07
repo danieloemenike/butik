@@ -1,140 +1,77 @@
-"use client";
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { 
-  ShoppingCart, 
-  ArrowRight, 
-  CheckCircle2,
-  Mail,
-  Twitter,
-  Instagram,
-  Youtube,
-  Facebook,
-  Github
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
+"use client"
 
-const Pricing = () => {
-    const router = useRouter();
-    return (
-  <section className="py-20 container">
-    <div className="text-center mb-16">
-      <Badge variant="outline" className="mb-4">Pricing</Badge>
-      <h2 className="text-3xl font-bold mb-4 dark:text-white">Simple, transparent pricing</h2>
-      <p className="text-muted-foreground max-w-2xl mx-auto">
-        Choose the perfect plan for your business needs
-      </p>
-    </div>
-    
-    <div className="grid md:grid-cols-3 gap-8">
-      {[
-        {
-          name: "Starter",
-          price: "$0",
-          description: "Perfect for small businesses starting their journey",
-          features: ["Up to 100 products", "Basic analytics", "24/7 support", "2% transaction fee"]
-        },
-        {
-          name: "Growth",
-          price: "$79",
-          description: "Ideal for growing businesses with more needs",
-          features: ["Unlimited products", "Advanced analytics", "Priority support", "1% transaction fee"]
-        },
-        {
-          name: "Enterprise",
-          price: "Custom",
-          description: "For large businesses with custom requirements",
-          features: ["Custom solutions", "Dedicated support", "Custom integrations", "Custom pricing"]
-        }
-      ].map((plan, index) => (
-        <Card key={index} className={`group hover:shadow-lg transition-shadow ${index === 1 ? 'border-primary' : ''}`}>
-          <CardContent className="p-6">
-            <h3 className="font-semibold mb-2 text-2xl dark:text-white">{plan.name}</h3>
-            <div className="mb-4">
-              <span className="text-4xl font-bold dark:text-white">{plan.price}</span>
-              {plan.price !== "Custom" && <span className="text-muted-foreground">/month</span>}
-            </div>
-            <p className="text-muted-foreground mb-6">{plan.description}</p>
-            <Button className="w-full mb-6" onClick={() => router.push("/api/auth/register")}>Get Started</Button>
-            <ul className="space-y-3">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span className="text-muted-foreground">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  </section>
-)};
+import { RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components"
+import { ButikLogo } from "@/components/ButikLogo"
 
-const CTASection = () => {
-    const router = useRouter();
-    return(
-  <section className="py-20">
-    <div className="container text-center">
-      <h2 className="text-3xl font-bold mb-4">Ready to grow your business?</h2>
-      <p className=" mb-8 max-w-2xl mx-auto">
-        Join thousands of successful businesses using Butik to power their online stores
-      </p>
-            <Button variant="secondary" size="lg" className="gap-2" onClick={ () => router.push("/api/auth/register") }>
-        Get Started Now
-        <ArrowRight className="h-4 w-4" />
-      </Button>
-    </div>
-  </section>
-)};
-
-const Footer = () => (
-    <footer className="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-800 via-black to-black text-slate-300">
-      <div className="container py-20">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
-          <div className="space-y-4">
-            <h4 className="text-lg font-bold text-white mb-4">Butik</h4>
-            <p className="text-slate-300">
-              Empowering businesses to thrive in the digital marketplace
+function CTASection() {
+  return (
+    <section className="border-t border-ink/8">
+      <div className="mx-auto max-w-6xl px-5 py-24 md:px-8 md:py-28">
+        <div className="relative overflow-hidden rounded-2xl bg-surface-deep px-8 py-16 text-surface-raised md:px-14 md:py-20 dark:border dark:border-ink/10 dark:bg-surface-raised dark:text-ink">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(58,168,157,0.28),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_80%_20%,rgba(58,168,157,0.16),transparent_50%)]" />
+          <div className="landing-grain opacity-20" />
+          <div className="relative max-w-2xl">
+            <h2 className="font-display text-3xl font-medium tracking-[-0.03em] md:text-5xl md:leading-[1.05]">
+              Ready to run commerce like infrastructure?
+            </h2>
+            <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-surface-raised/65 dark:text-ink-muted">
+              Stand up your business, provision stores, and connect clients on
+              APIs designed for multi-vendor scale.
             </p>
-            <div className="flex gap-4">
-              {[Twitter, Facebook, Instagram, Youtube, Github].map((Icon, i) => (
-                <a 
-                  key={i} 
-                  href="#" 
-                  className="hover:text-white transition-colors"
-                  aria-label="Social Media"
-                >
-                  <Icon className="h-5 w-5" />
-                </a>
-              ))}
+            <div className="mt-9 flex flex-wrap gap-3">
+              <RegisterLink className="inline-flex h-12 items-center rounded-md bg-surface-raised px-6 text-sm font-semibold text-surface-deep transition-opacity hover:opacity-90 dark:bg-ink dark:text-surface-raised">
+                Start building
+              </RegisterLink>
+              <a
+                href="#platform"
+                className="inline-flex h-12 items-center rounded-md border border-surface-raised/20 px-5 text-sm font-semibold text-surface-raised/85 transition-colors hover:bg-surface-raised/5 dark:border-ink/15 dark:text-ink-soft dark:hover:bg-ink/5"
+              >
+                Review platform
+              </a>
             </div>
           </div>
-          
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-ink/8 bg-surface-raised">
+      <div className="mx-auto max-w-6xl px-5 py-16 md:px-8">
+        <div className="grid gap-12 md:grid-cols-[1.2fr_repeat(3,0.7fr)]">
+          <div>
+            <ButikLogo href={null} className="text-ink" />
+            <p className="mt-3 max-w-[28ch] text-sm leading-relaxed text-ink-muted">
+              Multi-vendor commerce infrastructure for modern retail operators.
+            </p>
+          </div>
+
           {[
             {
               title: "Product",
-              links: ["Features", "Pricing", "Integrations", "Enterprise", "Security"]
+              links: ["Platform", "Operations", "Security"],
             },
             {
               title: "Resources",
-              links: ["Documentation", "Guides", "API Reference", "Blog", "Status"]
+              links: ["Documentation", "API reference", "Guides", "Status"],
             },
             {
               title: "Company",
-              links: ["About", "Customers", "Careers", "Contact", "Partners"]
-            }
-          ].map((column, index) => (
-            <div key={index}>
-              <h4 className="text-lg font-bold text-white mb-4">{column.title}</h4>
-              <ul className="space-y-3">
-                {column.links.map((link, i) => (
-                  <li key={i}>
-                    <a 
-                      href="#" 
-                      className="text-slate-300 hover:text-white transition-colors"
+              links: ["About", "Customers", "Careers", "Contact"],
+            },
+          ].map((column) => (
+            <div key={column.title}>
+              <p className="text-sm font-semibold tracking-[0.08em] text-ink uppercase">
+                {column.title}
+              </p>
+              <ul className="mt-4 space-y-3">
+                {column.links.map((link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-sm text-ink-muted transition-colors hover:text-ink"
                     >
                       {link}
                     </a>
@@ -144,29 +81,33 @@ const Footer = () => (
             </div>
           ))}
         </div>
-        
-        <div className="pt-8 border-t border-slate-700 text-slate-300 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2025 Butik. All rights reserved.</p>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Cookie Settings</a>
+
+        <div className="mt-14 flex flex-col gap-4 border-t border-ink/8 pt-8 text-sm text-ink-muted md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Butik. All rights reserved.</p>
+          <div className="flex flex-wrap gap-6">
+            <a href="#" className="transition-colors hover:text-ink">
+              Privacy
+            </a>
+            <a href="#" className="transition-colors hover:text-ink">
+              Terms
+            </a>
+            <a href="#" className="transition-colors hover:text-ink">
+              Cookies
+            </a>
           </div>
         </div>
       </div>
     </footer>
-  );
-  
+  )
+}
 
-
-const FooterSections = () => {
+function FooterSections() {
   return (
     <>
-      <Pricing />
       <CTASection />
       <Footer />
     </>
-  );
-};
+  )
+}
 
-export default FooterSections;
+export default FooterSections

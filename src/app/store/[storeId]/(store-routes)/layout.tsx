@@ -1,73 +1,54 @@
-import Header from '@/app/_components/Header';
-import SideBar from '@/components/Sidebar';
-import StoreHeader from '@/components/StoreHeader';
-import prismadb from '@/lib/prismadb';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import type { Metadata } from 'next';
-import { redirect, } from 'next/navigation';
+import { AppSidebar } from "@/components/app-sidebar"
+import StoreInsetHeader from "@/components/StoreInsetHeader"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import prismadb from "@/lib/prismadb"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
-    title: 'Butik - E-commerce Website',
-  description: 'The Future of E-commerce',
+  title: "Butik — Store dashboard",
+  description: "Operate your storefronts with Butik",
 }
 
 type BusinessProps = {
-    children: React.ReactNode
-    params: {
-      
-        storeId: string
-    }
+  children: React.ReactNode
+  params: Promise<{
+    storeId: string
+  }>
 }
 
 export default async function StoreLayout({ children, params }: BusinessProps) {
-    const { getUser, isAuthenticated } = getKindeServerSession()
-    const userInfo = await getUser()
-    const userId = userInfo?.id
-    const isAuth = await isAuthenticated()
-    if (!isAuth || !userId) {
-        redirect("/")
-    }
- 
-        const store = await prismadb?.store?.findUnique({
-            where: {
-             
-                userId,
-                id: params?.storeId
-            }
-    
-        })
-    
-        if (!store) {
-            redirect('/register-business')
-        }
+  const { storeId } = await params
+  const { getUser, isAuthenticated } = getKindeServerSession()
+  const userInfo = await getUser()
+  const userId = userInfo?.id
+  const isAuth = await isAuthenticated()
 
- 
- 
-   
-    
-  
+  if (!isAuth || !userId) {
+    redirect("/")
+  }
 
-  
-    
-    return (
-        <>
-        <div className="max-w-[100vw] ">
-        <SideBar storeName = {store?.name} />
-                <div className='w-full h-full'>
-                    <div className="md:ml-48 ml-0">
-                    <Header storeSideBar />
-                    </div>
-      
-        {/* <StoreHeader /> */}
-                    <div className='md:max-w-6xl md:ml-[230px] md:mx-auto md:mr-[50px] md:mt-[4px] md:p-3 '>
-                       
-  { children }
+  const store = await prismadb.store.findUnique({
+    where: {
+      userId,
+      id: storeId,
+    },
+  })
 
-</div>
+  if (!store) {
+    redirect("/register-business")
+  }
 
-                </div>
-                </div>
-    </>
-        
-    )
+  return (
+    <SidebarProvider>
+      <AppSidebar storeName={store.name} businessId={store.businessId} />
+      <SidebarInset className="min-h-svh bg-background">
+        <StoreInsetHeader />
+        <div className="mx-auto w-full max-w-[1180px] flex-1 px-4 py-5 md:px-6 md:py-6">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
