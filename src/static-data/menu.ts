@@ -1,9 +1,12 @@
 import {
+  ClipboardList,
   Home,
   ImageIcon,
   Package,
   Palette,
+  Paintbrush,
   Ruler,
+  Settings,
   Tags,
 } from "lucide-react"
 
@@ -18,6 +21,13 @@ export const Menu = [
         path: "/dashboard",
         pro: false,
         icon: Home,
+      },
+      {
+        id: "2",
+        title: "Orders",
+        path: "/orders",
+        pro: false,
+        icon: ClipboardList,
       },
     ],
   },
@@ -71,6 +81,26 @@ export const Menu = [
         path: "/sizes",
         pro: false,
         icon: Ruler,
+      },
+    ],
+  },
+  {
+    id: "5",
+    label: "Store",
+    menu: [
+      {
+        id: "1",
+        title: "Settings",
+        path: "/settings",
+        pro: false,
+        icon: Settings,
+      },
+      {
+        id: "2",
+        title: "Store appearance",
+        path: "/appearance",
+        pro: false,
+        icon: Paintbrush,
       },
     ],
   },

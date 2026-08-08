@@ -40,26 +40,55 @@ model User {
   @@index([businessId])
 }
 
+enum StoreStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum StoreColorMode {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
 model Store {
-  id          String      @id @default(cuid())
-  name        String
-  phoneNumber String?     @unique
-  address     String?
-  city        String?
-  country     String?
-  userId      String?
-  storeSlug   String?     @unique
-  businessId  String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  billboards  Billboard[] @relation("StoreToBillboard")
-  colors      Color[]     @relation("StoreToColor")
-  orders      Order[]     @relation("StoreToOrder")
-  products    Product[]   @relation("StoreToProduct")
-  sizes       Size[]      @relation("StoreToSize")
-  business    Business    @relation("BusinessToStore", fields: [businessId], references: [id])
+  id              String       @id @default(cuid())
+  name            String
+  phoneNumber     String?      @unique
+  address         String?
+  city            String?
+  country         String?
+  userId          String?
+  storeSlug       String?      @unique
+  businessId      String
+  status          StoreStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  logoUrl         String?
+  primaryColor    String       @default("#0F172A")
+  accentColor     String       @default("#C45C26")
+  backgroundColor String       @default("#FAFAF8")
+  darkPrimaryColor    String   @default("#F8FAFC")
+  darkAccentColor     String   @default("#E07A3D")
+  darkBackgroundColor String   @default("#0B1220")
+  themePreset     String?      @default("atelier")
+  colorMode       StoreColorMode @default(SYSTEM)
+  displayFont     String       @default("Figtree")
+  bodyFont        String       @default("Figtree")
+  tagline         String?
+  currency        String       @default("NGN")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  billboards      Billboard[]  @relation("StoreToBillboard")
+  colors          Color[]      @relation("StoreToColor")
+  orders          Order[]      @relation("StoreToOrder")
+  products        Product[]    @relation("StoreToProduct")
+  sizes           Size[]       @relation("StoreToSize")
+  business        Business     @relation("BusinessToStore", fields: [businessId], references: [id])
 
   @@index([businessId])
+  @@index([status])
+  @@index([storeSlug, status])
 }
 
 model Billboard {
@@ -133,7 +162,7 @@ model Product {
 }
 
 model ProductVariant {
-  id                   String    @id @default(cuid())
+  id                   String      @id @default(cuid())
   colorId              String
   sizeId               String
   quantity             Int?
@@ -142,12 +171,13 @@ model ProductVariant {
   blackFridayStartDate DateTime?
   blackFridayEndDate   DateTime?
   productId            String
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
   images               Image[]
-  color                Color     @relation(fields: [colorId], references: [id])
-  product              Product   @relation(fields: [productId], references: [id])
-  size                 Size      @relation(fields: [sizeId], references: [id])
+  orderItems           OrderItem[]
+  color                Color       @relation(fields: [colorId], references: [id])
+  product              Product     @relation(fields: [productId], references: [id])
+  size                 Size        @relation(fields: [sizeId], references: [id])
 
   @@index([productId])
   @@index([sizeId])
@@ -183,28 +213,63 @@ model Color {
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  isPaid     Boolean     @default(false)
-  phone      String      @default("")
-  address    String      @default("")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  storeId    String
-  store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems OrderItem[]
+  id                    String      @id @default(cuid())
+  reference             String      @unique
+  storeId               String
+  status                OrderStatus @default(PENDING)
+  customerName          String      @default("")
+  phone                 String      @default("")
+  address               String      @default("")
+  email                 String?
+  notes                 String?
+  currency              String      @default("NGN")
+  subtotal              Decimal     @default(0)
+  isPaid                Boolean     @default(false)
+  confirmationTokenHash String
+  idempotencyKey        String
+  /** When the unpaid PENDING hold expires and stockHeld lines should be released. */
+  holdsUntil            DateTime
+  confirmedAt           DateTime?
+  cancelledAt           DateTime?
+  expiredAt             DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  store                 Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems            OrderItem[]
 
+  @@unique([storeId, idempotencyKey])
   @@index([storeId])
+  @@index([storeId, status])
+  @@index([reference])
+  @@index([status, holdsUntil])
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  productId String
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  id               String          @id @default(cuid())
+  orderId          String
+  productId        String
+  productVariantId String?
+  quantity         Int             @default(1)
+  unitPrice        Decimal
+  lineTotal        Decimal
+  name             String
+  variantLabel     String?
+  /** True when stock was decremented for this line (false when inventory was unlimited). */
+  stockHeld        Boolean         @default(false)
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
   @@index([productId])
+  @@index([productVariantId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  EXPIRED
 }
 
 model Image {

@@ -3,7 +3,7 @@ import { getProductCount } from "@/actions/getProductCount"
 import { getTotalRevenue } from "@/actions/getTotalRevenue"
 import { getSalesCount } from "@/actions/getSalesCount"
 import { getGraphRevenue } from "@/actions/getGraphRevenue"
-import { formatter } from "@/lib/utils"
+import { formatStoreMoney } from "@/lib/utils"
 import ChartOverview from "@/components/ChartOverview"
 import prismadb from "@/lib/prismadb"
 import {
@@ -30,6 +30,7 @@ type Props = {
 async function DashboardPage({ params }: Props) {
   const { storeId } = await params
   const [
+    store,
     totalRevenue,
     totalSalesCount,
     totalProducts,
@@ -41,6 +42,10 @@ async function DashboardPage({ params }: Props) {
     featuredCount,
     recentProducts,
   ] = await Promise.all([
+    prismadb.store.findUnique({
+      where: { id: storeId },
+      select: { currency: true },
+    }),
     getTotalRevenue(storeId),
     getSalesCount(storeId),
     getProductCount(storeId),
@@ -59,11 +64,17 @@ async function DashboardPage({ params }: Props) {
       orderBy: { createdAt: "desc" },
       take: 5,
       include: {
-        images: { take: 1 },
+        images: {
+          where: { productVariantId: null },
+          take: 1,
+        },
         category: true,
       },
     }),
   ])
+
+  const currency = store?.currency || "NGN"
+  const money = (amount: number) => formatStoreMoney(amount, currency)
 
   const avgOrderValue =
     totalSalesCount > 0 ? totalRevenue / totalSalesCount : 0
@@ -71,7 +82,7 @@ async function DashboardPage({ params }: Props) {
   const metrics = [
     {
       title: "Total revenue",
-      value: formatter.format(totalRevenue),
+      value: money(totalRevenue),
       hint: "Gross sales",
       icon: Wallet,
     },
@@ -89,7 +100,7 @@ async function DashboardPage({ params }: Props) {
     },
     {
       title: "Avg. order",
-      value: formatter.format(avgOrderValue),
+      value: money(avgOrderValue),
       hint: "Per completed sale",
       icon: Receipt,
     },
@@ -311,7 +322,7 @@ async function DashboardPage({ params }: Props) {
                       </p>
                     </div>
                     <p className="text-[12px] font-medium text-foreground">
-                      {formatter.format(Number(product.price))}
+                      {money(Number(product.price))}
                     </p>
                   </Link>
                 </li>

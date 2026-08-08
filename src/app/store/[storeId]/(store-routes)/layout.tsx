@@ -40,9 +40,21 @@ export default async function StoreLayout({ children, params }: BusinessProps) {
     redirect("/register-business")
   }
 
+  const storefrontHref = store.storeSlug
+    ? store.status === "PUBLISHED"
+      ? `/${store.storeSlug}`
+      : `/${store.storeSlug}?preview=1`
+    : null
+
   return (
     <SidebarProvider>
-      <AppSidebar storeName={store.name} businessId={store.businessId} />
+      <AppSidebar
+        storeName={store.name}
+        businessId={store.businessId}
+        storeStatus={store.status}
+        storeSlug={store.storeSlug}
+        storefrontHref={storefrontHref}
+      />
       <SidebarInset className="min-h-svh bg-background">
         <StoreInsetHeader />
         <div className="mx-auto w-full max-w-[1180px] flex-1 px-4 py-5 md:px-6 md:py-6">

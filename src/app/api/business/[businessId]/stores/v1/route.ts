@@ -1,6 +1,10 @@
 import prismadb from "@/lib/prismadb"
 import { getMaxStores } from "@/lib/store-limits"
 import { sanitizeNationalNumber } from "@/lib/store-form"
+import {
+  isValidStoreSlug,
+  normalizeStoreSlug,
+} from "@/lib/store-identity"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 import { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
@@ -85,12 +89,21 @@ export async function POST(
     const name = requireTrimmed(storeName, "Store name is required.", "storeName")
     if (name instanceof NextResponse) return name
 
-    const slug = requireTrimmed(
+    const rawSlug = requireTrimmed(
       storeSlug,
       "Store slug is required. Try a different store name.",
       "storeSlug"
     )
-    if (slug instanceof NextResponse) return slug
+    if (rawSlug instanceof NextResponse) return rawSlug
+
+    const slug = normalizeStoreSlug(rawSlug)
+    if (!isValidStoreSlug(slug)) {
+      return jsonError(
+        "Store slug is invalid or reserved. Use lowercase letters, numbers, and underscores.",
+        400,
+        "storeSlug"
+      )
+    }
 
     const rawPhone = requireTrimmed(
       storePhoneNumber,
@@ -192,18 +205,27 @@ export async function POST(
 }
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params: rawParams }: { params: Promise<{ businessId: string }> }
 ) {
   const params = await rawParams
   const { businessId } = params
   try {
+    const { getUser, isAuthenticated } = getKindeServerSession()
+    const userInfo = await getUser()
+    const userId = userInfo?.id
+    const isAuth = await isAuthenticated()
+
+    if (!isAuth || !userId) {
+      return jsonError("Unauthorized.", 401)
+    }
+
     if (!businessId) {
       return jsonError("Business ID is required.", 400)
     }
 
     const stores = await prismadb.store.findMany({
-      where: { businessId },
+      where: { businessId, userId },
       orderBy: { createdAt: "desc" },
     })
 

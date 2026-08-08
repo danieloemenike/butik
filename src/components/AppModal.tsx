@@ -40,11 +40,13 @@ export function AppModal({
   const descriptionId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   const handleClose = useCallback(() => {
     if (!open) return
-    onClose()
-  }, [onClose, open])
+    onCloseRef.current()
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -56,17 +58,24 @@ export function AppModal({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault()
-        handleClose()
+        onCloseRef.current()
       }
     }
 
     window.addEventListener("keydown", onKeyDown)
 
+    // Autofocus only when the modal opens — not when onClose identity changes.
     const frame = window.requestAnimationFrame(() => {
-      const focusable = panelRef.current?.querySelector<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-      focusable?.focus()
+      const panel = panelRef.current
+      if (!panel) return
+      const preferred =
+        panel.querySelector<HTMLElement>(
+          'input:not([disabled]):not([type="hidden"]), textarea:not([disabled]), select:not([disabled])'
+        ) ??
+        panel.querySelector<HTMLElement>(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        )
+      preferred?.focus()
     })
 
     return () => {
@@ -75,7 +84,7 @@ export function AppModal({
       document.body.style.overflow = originalOverflow
       previouslyFocused.current?.focus?.()
     }
-  }, [open, handleClose])
+  }, [open])
 
   if (!open || typeof document === "undefined") return null
 

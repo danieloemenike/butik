@@ -8,12 +8,17 @@ import { format } from "date-fns"
 import columns from "./TableCategories/columns"
 import { Package } from "lucide-react"
 import { useGetProductsQuery } from "@/reduxStore/services/productApiSlice"
-import { formatter } from "@/lib/utils"
+import { formatStoreMoney } from "@/lib/utils"
 import { ApiList } from "@/components/ui/api-list"
 import Heading from "@/components/StoreHeading"
 import { EmptyState } from "@/components/EmptyState"
+import { isValidProductSlug } from "@/lib/store-identity"
 
-function ProductPage() {
+type Props = {
+  storeCurrency?: string
+}
+
+function ProductPage({ storeCurrency = "NGN" }: Props) {
   const [loading, setLoading] = useState(false)
   const { storeId } = useParams()
   const router = useRouter()
@@ -45,18 +50,31 @@ function ProductPage() {
     data != null &&
     data.length != null
 
-  const formattedProducts = data?.map((item) => ({
-    id: item.id,
-    name: item.name,
-    isFeatured: item.isFeatured,
-    isArchived: item.isArchived,
-    price: formatter.format(Number(item.price)),
-    category: item.category.name,
-    size: item.size.name,
-    color: item.color.value,
-    createdAt: format(new Date(item.createdAt), "MMMM do, yyyy"),
-    image: item.images[0].url,
-  }))
+  const formattedProducts = data?.map((item) => {
+    const slug = item.slug ?? null
+    const storefrontVisible = !item.isArchived && isValidProductSlug(slug)
+
+    const sizeNames = new Set<string>()
+    if (item.size?.name) sizeNames.add(item.size.name)
+    for (const variant of item.productVariant ?? []) {
+      if (variant.size?.name) sizeNames.add(variant.size.name)
+    }
+
+    return {
+      id: item.id,
+      name: item.name,
+      isFeatured: item.isFeatured,
+      isArchived: item.isArchived,
+      price: formatStoreMoney(Number(item.price), storeCurrency),
+      category: item.category.name,
+      size: [...sizeNames].join(", ") || item.size?.name || "—",
+      color: item.color.value,
+      createdAt: format(new Date(item.createdAt), "MMMM do, yyyy"),
+      image: item.images[0]?.url ?? "",
+      slug,
+      storefrontVisible,
+    }
+  })
 
   return (
     <main className="space-y-1">

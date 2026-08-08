@@ -16,6 +16,7 @@ type Props = {
   onClose: () => void
   onConfirm?: () => void
   loading?: boolean
+  confirmLabel?: string
 }
 
 function FormattedAlertModal({
@@ -25,6 +26,7 @@ function FormattedAlertModal({
   onClose,
   onConfirm,
   loading = false,
+  confirmLabel = "Delete",
 }: Props) {
   const onChange = (open: boolean) => {
     if (!open) {
@@ -52,7 +54,7 @@ function FormattedAlertModal({
               disabled={loading}
               onClick={onConfirm}
             >
-              {loading ? "Deleting…" : "Delete"}
+              {loading ? "Working…" : confirmLabel}
             </Button>
           )}
         </DialogFooter>

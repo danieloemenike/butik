@@ -1,146 +1,99 @@
-import { NextResponse } from "next/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-
-import prismadb from "@/lib/prismadb";
+import prismadb from "@/lib/prismadb"
+import { requireOwnedStoreById } from "@/lib/store-access"
+import { NextResponse } from "next/server"
 
 export async function GET(
-  req: Request,
-  { params: rawParams }: { params: Promise<{ categoryId: string , storeId?: string}> }
+  _req: Request,
+  {
+    params: rawParams,
+  }: { params: Promise<{ categoryId: string; storeId: string }> }
 ) {
-    try {
-    const params = await rawParams;
-      
+  try {
+    const params = await rawParams
+    const auth = await requireOwnedStoreById(params.storeId)
+    if (auth.error) return auth.error
 
-     
-    // if (!params.storeId) {
-    //     return new NextResponse("Store id is required", { status: 400 });
-    //   }
+    if (!params.categoryId) {
+      return new NextResponse("Category id is required", { status: 400 })
+    }
+
     const category = await prismadb.category.findFirst({
       where: {
-            id: params.categoryId,
+        id: params.categoryId,
       },
-    
-    });
-        if (!category) {
-            return new NextResponse("Category Not found", {status: 404})
+    })
+    if (!category) {
+      return new NextResponse("Category Not found", { status: 404 })
     }
-    return NextResponse.json(category);
+    return NextResponse.json(category)
   } catch (error) {
-    console.log('[CATEGORY_GET]', error);
-    return new NextResponse("Internal error", { status: 500 });
+    console.log("[CATEGORY_GET]", error)
+    return new NextResponse("Internal error", { status: 500 })
   }
-};
+}
 
 export async function DELETE(
-    req: Request,
-    { params: rawParams }: { params: Promise<{ categoryId: string, storeId: string }> }
-  ) {
-    try {
-      const params = await rawParams;
-      const { getUser, isAuthenticated } = getKindeServerSession()
-    
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-          const isAuth = await isAuthenticated()
-     
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
-     
-  
-      if (!params.categoryId) {
-        return new NextResponse("Category id is required", { status: 400 });
-      }
-  
-      const storeByUserId = await prismadb.store.findFirst({
-        where: {
-          id: params.storeId,
-          userId,
-        }
-      });
-  
-      if (!storeByUserId) {
-        return new NextResponse("Unauthorized", { status: 405 });
-      }
-  
-      const category = await prismadb.category.delete({
-        where: {
-          id: params.categoryId,
-        }
-      });
-    
-      return NextResponse.json(category);
-    } catch (error) {
-      console.log('[CATEGORY_DELETE]', error);
-      return new NextResponse("Internal error", { status: 500 });
-    }
-  };
+  _req: Request,
+  {
+    params: rawParams,
+  }: { params: Promise<{ categoryId: string; storeId: string }> }
+) {
+  try {
+    const params = await rawParams
+    const auth = await requireOwnedStoreById(params.storeId)
+    if (auth.error) return auth.error
 
-  export async function PATCH(
-    req: Request,
-    { params: rawParams }: { params: Promise<{ categoryId: string, storeId: string }> }
-  ) {
-    try {   
-      const params = await rawParams;
-      const { getUser, isAuthenticated } = getKindeServerSession()
-    
-      const userInfo = await getUser()
-          const userId = userInfo?.id
-   
-          const isAuth = await isAuthenticated()
-     
-      if (!isAuth) {
-          return new NextResponse("unauthorized", {status: 401})
-      }
-      const body = await req.json();
-      
-      const { name, billboardId } = body;
-      
-      if (!userId) {
-        return new NextResponse("Unauthenticated", { status: 403 });
-      }
-  
-      if (!billboardId) {
-        return new NextResponse("Billboard ID is required", { status: 400 });
-      }
-  
-      if (!name) {
-        return new NextResponse("Name is required", { status: 400 });
-      }
-  
-      if (!params.categoryId) {
-        return new NextResponse("Category id is required", { status: 400 });
-      }
-  
-      const storeByUserId = await prismadb.store.findFirst({
-        where: {
-          id: params.storeId,
-          userId,
-        }
-      });
-  
-      if (!storeByUserId) {
-        return new NextResponse("Unauthorized", { status: 405 });
-      }
-  
-      const category = await prismadb.category.update({
-        where: {
-          id: params.categoryId,
-        },
-        data: {
-          name,
-          
-        }
-      });
-        if (!category) {
-            return new NextResponse("Category not found", { status: 404 });
-        }
-    
-      return NextResponse.json(category);
-    } catch (error) {
-      console.log('[CATEGORY_PATCH]', error);
-      return new NextResponse("Internal error", { status: 500 });
+    if (!params.categoryId) {
+      return new NextResponse("Category id is required", { status: 400 })
     }
-  };
-  
+
+    const category = await prismadb.category.delete({
+      where: {
+        id: params.categoryId,
+      },
+    })
+
+    return NextResponse.json(category)
+  } catch (error) {
+    console.log("[CATEGORY_DELETE]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  {
+    params: rawParams,
+  }: { params: Promise<{ categoryId: string; storeId: string }> }
+) {
+  try {
+    const params = await rawParams
+    const auth = await requireOwnedStoreById(params.storeId)
+    if (auth.error) return auth.error
+
+    const body = await req.json()
+    const { name } = body
+
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 })
+    }
+
+    if (!params.categoryId) {
+      return new NextResponse("Category id is required", { status: 400 })
+    }
+
+    const category = await prismadb.category.update({
+      where: {
+        id: params.categoryId,
+      },
+      data: {
+        name,
+      },
+    })
+
+    return NextResponse.json(category)
+  } catch (error) {
+    console.log("[CATEGORY_PATCH]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}

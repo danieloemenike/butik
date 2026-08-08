@@ -7,7 +7,9 @@
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "tsc --noEmit",
+    "test": "tsx --test src/lib/store-identity.test.ts src/lib/commerce/policy.test.ts src/lib/commerce/place-order.adversarial.test.ts src/lib/commerce/product-variants.test.ts src/lib/storefront/themes.test.ts src/lib/storefront/fonts.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",
@@ -42,6 +44,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "country-state-city": "^3.2.1",
+    "currency.js": "^2.0.4",
     "date-fns": "^4.4.0",
     "dotenv": "^17.4.2",
     "lucide-react": "^1.29.0",
@@ -73,6 +76,7 @@
     "pg": "^8.22.0",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.11",
     "typescript": "^7.0.2"
   }
 }

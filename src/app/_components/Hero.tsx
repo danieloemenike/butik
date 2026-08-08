@@ -409,13 +409,50 @@ function HeroBackdrop() {
       <div className="landing-hero-bg absolute inset-0 animate-landing-pan" />
       <div className="landing-grid absolute inset-0 opacity-50 dark:opacity-35" />
       <div className="landing-grain absolute inset-0 z-[1]" />
+    </div>
+  )
+}
 
-      <div className="absolute inset-x-0 bottom-[-8%] top-[28%] px-4 sm:px-8 lg:left-[42%] lg:right-[-4%] lg:top-[14%] lg:bottom-[-14%] lg:px-0">
-        <DashboardMock />
+function HeroCopy() {
+  return (
+    <div className="max-w-xl shrink-0">
+      <div className="animate-landing-fade-up">
+        <ButikLogo href={null} size="xl" className="text-ink" />
       </div>
+      <h1 className="animate-landing-fade-up mt-4 max-w-[16ch] font-display text-[clamp(1.55rem,5.8vw,2.2rem)] leading-[1.18] font-medium tracking-[-0.03em] text-ink-soft sm:mt-6 [animation-delay:110ms]">
+        Multi-vendor commerce infrastructure for operators who scale.
+      </h1>
+      <p className="animate-landing-fade-up mt-3 max-w-[34ch] text-[0.95rem] leading-relaxed text-ink-muted sm:mt-5 sm:text-lg [animation-delay:190ms]">
+        Launch storefronts, manage catalogs, and ship store-scoped APIs from one
+        control plane built for enterprise operations.
+      </p>
+      <div className="animate-landing-fade-up mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center [animation-delay:270ms]">
+        <RegisterLink className="inline-flex h-11 w-full items-center justify-center rounded-md bg-ink px-6 text-sm font-semibold text-surface-raised transition-opacity hover:opacity-90 sm:h-12 sm:w-auto">
+          Start building
+        </RegisterLink>
+        <a
+          href="#platform"
+          className="inline-flex h-11 w-full items-center justify-center rounded-md border border-ink/15 px-5 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/5 sm:h-12 sm:w-auto"
+        >
+          Explore platform
+        </a>
+      </div>
+    </div>
+  )
+}
 
-      <div className="landing-hero-veil absolute inset-0" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-surface-raised to-transparent lg:hidden dark:from-[#0c1219]/80" />
+function MobileDashboardPreview() {
+  return (
+    <div
+      className="relative mt-8 min-h-[220px] flex-1 overflow-hidden sm:mt-10 sm:min-h-[280px] lg:hidden"
+      aria-hidden
+    >
+      <div className="absolute inset-x-0 top-2 bottom-0 origin-top scale-[0.96] sm:inset-x-2 sm:scale-100">
+        <div className="h-[130%] w-full sm:h-[125%]">
+          <DashboardMock />
+        </div>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface-raised via-surface-raised/85 to-transparent dark:from-[#0c1219] dark:via-[#0c1219]/90" />
     </div>
   )
 }
@@ -425,30 +462,20 @@ function Hero() {
     <section className="relative isolate min-h-[100svh] overflow-hidden bg-surface-raised text-ink">
       <HeroBackdrop />
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-5 pb-16 pt-28 sm:px-8 md:justify-center md:pb-24 md:pt-24">
-        <div className="max-w-xl">
-          <div className="animate-landing-fade-up">
-            <ButikLogo href={null} size="xl" className="text-ink" />
-          </div>
-          <h1 className="animate-landing-fade-up mt-6 max-w-[16ch] font-display text-[clamp(1.55rem,3.2vw,2.2rem)] leading-[1.18] font-medium tracking-[-0.03em] text-ink-soft [animation-delay:110ms]">
-            Multi-vendor commerce infrastructure for operators who scale.
-          </h1>
-          <p className="animate-landing-fade-up mt-5 max-w-[34ch] text-base leading-relaxed text-ink-muted sm:text-lg [animation-delay:190ms]">
-            Launch storefronts, manage catalogs, and ship store-scoped APIs from
-            one control plane built for enterprise operations.
-          </p>
-          <div className="animate-landing-fade-up mt-8 flex flex-wrap items-center gap-3 [animation-delay:270ms]">
-            <RegisterLink className="inline-flex h-12 items-center rounded-md bg-ink px-6 text-sm font-semibold text-surface-raised transition-opacity hover:opacity-90">
-              Start building
-            </RegisterLink>
-            <a
-              href="#platform"
-              className="inline-flex h-12 items-center rounded-md border border-ink/15 px-5 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/5"
-            >
-              Explore platform
-            </a>
-          </div>
-        </div>
+      {/* Desktop: absolute product preview on the right */}
+      <div
+        className="pointer-events-none absolute top-[14%] right-0 bottom-[-14%] left-[42%] z-1 hidden lg:block"
+        aria-hidden
+      >
+        <DashboardMock />
+      </div>
+
+      {/* Softens copy over the product preview (top on mobile, left on lg+) */}
+      <div className="landing-hero-veil pointer-events-none absolute inset-0 z-2" aria-hidden />
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col px-5 pt-20 pb-0 sm:px-8 sm:pt-24 lg:justify-center lg:pt-24 lg:pb-24">
+        <HeroCopy />
+        <MobileDashboardPreview />
       </div>
     </section>
   )

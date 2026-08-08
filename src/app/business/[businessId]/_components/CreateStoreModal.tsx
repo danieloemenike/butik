@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import { City, Country } from "country-state-city"
-import { CircleDotDashed } from "lucide-react"
+import { Check, CircleDotDashed, Loader2 } from "lucide-react"
 import {
   Form,
   FormControl,
@@ -58,7 +58,7 @@ const formSchema = z
   })
   .superRefine((values, ctx) => {
     const name = values.storeName.trim()
-    const slug = slugifyStoreName(name)
+    const slug = values.storeSlug.trim() || slugifyStoreName(name)
     if (!slug) {
       ctx.addIssue({
         code: "custom",
@@ -107,6 +107,14 @@ type FormValues = z.infer<typeof formSchema>
 type ApiErrorBody = {
   message?: string
   field?: string
+}
+
+type SlugCheckResult = {
+  slug: string
+  available: boolean
+  reason?: string
+  message?: string
+  suggestions?: string[]
 }
 
 export type StoreDetails = {
@@ -189,6 +197,9 @@ export function CreateStoreModal({
   const router = useRouter()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
+  const [slugManual, setSlugManual] = useState(false)
+  const [slugCheck, setSlugCheck] = useState<SlugCheckResult | null>(null)
+  const [slugChecking, setSlugChecking] = useState(false)
   const isEditing = Boolean(store?.id)
 
   const form = useForm<FormValues>({
@@ -198,7 +209,7 @@ export function CreateStoreModal({
     reValidateMode: "onChange",
   })
 
-  const storeName = useWatch({ control: form.control, name: "storeName" })
+  const storeSlug = useWatch({ control: form.control, name: "storeSlug" })
   const countryCode = useWatch({ control: form.control, name: "countryCode" })
   const dialCode = getDialCode(countryCode)
 
@@ -232,24 +243,80 @@ export function CreateStoreModal({
     })
   }, [countryCode])
 
+  const handleModalClose = useCallback(() => {
+    if (!loading) onClose()
+  }, [loading, onClose])
+
   useEffect(() => {
     if (!open) {
       form.reset(emptyDefaults())
       setLoading(false)
+      setSlugManual(false)
+      setSlugCheck(null)
+      setSlugChecking(false)
       return
     }
 
     form.reset(store ? defaultsFromStore(store) : emptyDefaults())
+    setSlugManual(Boolean(store?.storeSlug))
   }, [open, store, form])
 
   useEffect(() => {
     if (!open) return
-    form.setValue("storeSlug", slugifyStoreName(storeName), {
-      shouldValidate: false,
-    })
-  }, [storeName, form, open])
+    const slug = (storeSlug ?? "").trim()
+    if (slug.length < 2) {
+      setSlugCheck(null)
+      setSlugChecking(false)
+      return
+    }
+
+    let cancelled = false
+    setSlugChecking(true)
+    const timer = window.setTimeout(async () => {
+      try {
+        const { data } = await axios.get<SlugCheckResult>(
+          `/api/business/${businessId}/stores/slug/v1`,
+          {
+            params: {
+              slug,
+              ...(store?.id ? { excludeStoreId: store.id } : {}),
+            },
+          }
+        )
+        if (!cancelled) {
+          setSlugCheck(data)
+          if (!data.available) {
+            form.setError("storeSlug", {
+              message: data.message || "This slug is not available",
+            })
+          } else {
+            form.clearErrors("storeSlug")
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setSlugCheck(null)
+        }
+      } finally {
+        if (!cancelled) setSlugChecking(false)
+      }
+    }, 350)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [storeSlug, open, businessId, store?.id, form])
 
   async function onSubmit(values: FormValues) {
+    const slug = values.storeSlug.trim() || slugifyStoreName(values.storeName)
+    if (slugCheck && !slugCheck.available && slugCheck.slug === slug) {
+      form.setError("storeSlug", {
+        message: slugCheck.message || "This slug is not available",
+      })
+      return
+    }
+
     try {
       setLoading(true)
       const internationalPhone = buildInternationalPhone(
@@ -258,7 +325,7 @@ export function CreateStoreModal({
       )
       const payload = {
         storeName: values.storeName.trim(),
-        storeSlug: slugifyStoreName(values.storeName),
+        storeSlug: slug,
         storePhoneNumber: internationalPhone,
         storeAddress: values.storeAddress.trim(),
         storeCity: values.storeCity.trim(),
@@ -326,12 +393,20 @@ export function CreateStoreModal({
   else if (loading) submitLabel = "Creating…"
   else if (isEditing) submitLabel = "Save changes"
 
+  const applySuggestion = (suggestion: string) => {
+    setSlugManual(true)
+    form.setValue("storeSlug", suggestion, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+    form.clearErrors("storeSlug")
+  }
+
   return (
     <AppModal
       open={open}
-      onClose={() => {
-        if (!loading) onClose()
-      }}
+      onClose={handleModalClose}
       title={isEditing ? "Edit store" : "Create store"}
       description={
         isEditing
@@ -341,7 +416,10 @@ export function CreateStoreModal({
       size="xl"
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 [&_input]:autofill:shadow-[inset_0_0_0_1000px_hsl(var(--background))]">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 [&_input]:autofill:shadow-[inset_0_0_0_1000px_hsl(var(--background))]"
+        >
           <div className="space-y-4">
             <p className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
               Identity
@@ -357,10 +435,24 @@ export function CreateStoreModal({
                       <Input
                         placeholder="Northside Boutique"
                         disabled={loading}
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck={false}
                         className="h-11 rounded-lg focus-visible:ring-foreground/15 focus-visible:ring-offset-0"
                         {...field}
                         onChange={(event) => {
-                          field.onChange(event)
+                          const next = event.target.value
+                          field.onChange(next)
+                          // Keep published slug stable while editing an existing store.
+                          // For create (or after a suggestion), name edits re-sync slug.
+                          if (isEditing && store?.storeSlug && slugManual) {
+                            form.clearErrors("storeSlug")
+                            return
+                          }
+                          setSlugManual(false)
+                          form.setValue("storeSlug", slugifyStoreName(next), {
+                            shouldValidate: false,
+                          })
                           form.clearErrors("storeSlug")
                         }}
                       />
@@ -384,7 +476,51 @@ export function CreateStoreModal({
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <div className="min-h-5 text-xs">
+                      {slugChecking ? (
+                        <p className="inline-flex items-center gap-1.5 text-muted-foreground">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Checking availability…
+                        </p>
+                      ) : null}
+                      {!slugChecking && slugCheck?.available ? (
+                        <p className="inline-flex items-center gap-1.5 text-teal">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2} />
+                          Slug is available
+                        </p>
+                      ) : null}
+                      {!slugChecking &&
+                      slugCheck &&
+                      !slugCheck.available &&
+                      slugCheck.suggestions &&
+                      slugCheck.suggestions.length > 0 ? (
+                        <div className="space-y-1.5">
+                          <p className="text-destructive">
+                            {slugCheck.message || "Slug unavailable"}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {slugCheck.suggestions.map((suggestion) => (
+                              <button
+                                key={suggestion}
+                                type="button"
+                                disabled={loading}
+                                onClick={() => applySuggestion(suggestion)}
+                                className="rounded-md border border-border bg-background px-2 py-1 text-[11px] font-medium text-foreground transition-colors hover:border-foreground/30 hover:bg-secondary"
+                              >
+                                @{suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                      {!slugChecking &&
+                      slugCheck &&
+                      !slugCheck.available &&
+                      (!slugCheck.suggestions ||
+                        slugCheck.suggestions.length === 0) ? (
+                        <FormMessage />
+                      ) : null}
+                    </div>
                   </FormItem>
                 )}
               />
@@ -522,7 +658,10 @@ export function CreateStoreModal({
                         className="h-full rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
                         {...field}
                         onChange={(event) => {
-                          const next = event.target.value.replace(/[^\d\s()-]/g, "")
+                          const next = event.target.value.replace(
+                            /[^\d\s()-]/g,
+                            ""
+                          )
                           field.onChange(next)
                         }}
                         onBlur={(event) => {
@@ -549,12 +688,20 @@ export function CreateStoreModal({
               type="button"
               variant="outline"
               disabled={loading}
-              onClick={onClose}
+              onClick={handleModalClose}
               className="font-semibold"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="font-semibold">
+            <Button
+              type="submit"
+              disabled={
+                loading ||
+                slugChecking ||
+                Boolean(slugCheck && !slugCheck.available)
+              }
+              className="font-semibold"
+            >
               {loading && (
                 <CircleDotDashed className="mr-2 h-4 w-4 animate-spin" />
               )}

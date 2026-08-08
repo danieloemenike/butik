@@ -26,6 +26,9 @@ async function MarketingHeader() {
           <a href="#operations" className="transition-colors hover:text-ink">
             Operations
           </a>
+          <Link href="/explore" className="transition-colors hover:text-ink">
+            Explore
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2 md:gap-3">

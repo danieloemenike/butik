@@ -51,15 +51,29 @@ function Footer() {
           {[
             {
               title: "Product",
-              links: ["Platform", "Operations", "Security"],
+              links: [
+                { label: "Platform", href: "#platform" },
+                { label: "Operations", href: "#operations" },
+                { label: "Explore stores", href: "/explore" },
+              ],
             },
             {
               title: "Resources",
-              links: ["Documentation", "API reference", "Guides", "Status"],
+              links: [
+                { label: "Documentation", href: "#" },
+                { label: "API reference", href: "#" },
+                { label: "Guides", href: "#" },
+                { label: "Status", href: "#" },
+              ],
             },
             {
               title: "Company",
-              links: ["About", "Customers", "Careers", "Contact"],
+              links: [
+                { label: "About", href: "#" },
+                { label: "Customers", href: "#" },
+                { label: "Careers", href: "#" },
+                { label: "Contact", href: "#" },
+              ],
             },
           ].map((column) => (
             <div key={column.title}>
@@ -68,12 +82,12 @@ function Footer() {
               </p>
               <ul className="mt-4 space-y-3">
                 {column.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-sm text-ink-muted transition-colors hover:text-ink"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}

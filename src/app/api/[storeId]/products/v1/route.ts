@@ -1,388 +1,266 @@
-import { NextResponse } from "next/server";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import prismadb from "@/lib/prismadb";
-import { ProductVariant, Product, Image } from "@prisma/client";
+import { NextResponse } from "next/server"
+import prismadb from "@/lib/prismadb"
+import { requireOwnedStoreById } from "@/lib/store-access"
+import { parseWritableStockQuantity } from "@/lib/commerce/policy"
+import { isValidProductSlug } from "@/lib/store-identity"
+import {
+  buildSizeVariants,
+  resolveSizeSelection,
+} from "@/lib/commerce/product-variants"
+import { Prisma } from "@prisma/client"
 
-type TProductVariantSchema = {
-	id?: string;
-	colorId: string;
-	sizeId: string;
-	quantity: number | null;
-	price: number;
-	discountedPrice: number;
-	images: Image[];
-};
+type ManualVariantBody = {
+  colorId: string
+  sizeId: string
+  quantity?: number | null
+  price: number
+  discountedPrice?: number | null
+  images?: { url: string }[]
+}
+
+function slugConflictResponse() {
+  return NextResponse.json(
+    {
+      message: "A product with this URL slug already exists. Choose another.",
+      field: "slug",
+    },
+    { status: 409 }
+  )
+}
+
+function isSlugUniqueViolation(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002" &&
+    Array.isArray(error.meta?.target) &&
+    (error.meta?.target as string[]).includes("slug")
+  )
+}
 
 export async function POST(
-	req: Request,
-	{ params: rawParams }: { params: Promise<{ storeId: string }> }
+  req: Request,
+  { params: rawParams }: { params: Promise<{ storeId: string }> }
 ) {
-	try {
-		const params = await rawParams;
-		const { getUser, isAuthenticated } = getKindeServerSession();
+  try {
+    const params = await rawParams
+    const auth = await requireOwnedStoreById(params.storeId)
+    if (auth.error) return auth.error
 
-		const userInfo = await getUser();
-		const userId = userInfo?.id;
+    const body = await req.json()
+    const {
+      name,
+      slug,
+      price,
+      discountedPrice,
+      description,
+      categoryId,
+      subcategoryId,
+      colorId,
+      images,
+      isFeatured,
+      isArchived,
+      productVariant,
+      quantity: rawQuantity,
+    } = body
 
-		const isAuth = await isAuthenticated();
+    if (!name) {
+      return new NextResponse("Name is required", { status: 400 })
+    }
+    if (!slug) {
+      return new NextResponse("Slug is required", { status: 400 })
+    }
+    if (!isValidProductSlug(slug)) {
+      return NextResponse.json(
+        {
+          message:
+            "Slug must use lowercase letters, numbers, and underscores (e.g. air_jordan_13).",
+          field: "slug",
+        },
+        { status: 400 }
+      )
+    }
+    if (!description) {
+      return new NextResponse("Description is required", { status: 400 })
+    }
 
-		if (!isAuth) {
-			return new NextResponse("unauthorized", { status: 401 });
-		}
-		if (!userId) {
-			return new NextResponse("UnAuthorized", { status: 403 });
-		}
+    if (!images || !images.length) {
+      return new NextResponse("Images are required", { status: 400 })
+    }
 
-		const body = await req.json();
-		console.log(body);
-		const {
-			name,
-			slug,
-			price,
-			discountedPrice,
-			description,
-			categoryId,
-			subcategoryId,
-			colorId,
-			sizeId,
-			images,
-			isFeatured,
-			isArchived,
-			productVariant,
-		} = body;
+    if (!price) {
+      return new NextResponse("Price is required", { status: 400 })
+    }
 
-		if (!userId) {
-			return new NextResponse("Unauthenticated", { status: 403 });
-		}
+    if (!categoryId) {
+      return new NextResponse("Category id is required", { status: 400 })
+    }
 
-		if (!name) {
-			return new NextResponse("Name is required", { status: 400 });
-		}
-		if (!slug) {
-			return new NextResponse("Slug is required", { status: 400 });
-		}
-		if (!description) {
-			return new NextResponse("Description is required", { status: 400 });
-		}
+    if (!subcategoryId) {
+      return new NextResponse("Subcategory id is required", { status: 400 })
+    }
 
-		if (!images || !images.length) {
-			return new NextResponse("Images are required", { status: 400 });
-		}
+    if (!colorId) {
+      return new NextResponse("Color id is required", { status: 400 })
+    }
 
-		if (!price) {
-			return new NextResponse("Price is required", { status: 400 });
-		}
+    const sizes = resolveSizeSelection(body)
+    if ("error" in sizes) {
+      return NextResponse.json(
+        { message: sizes.error, field: "sizeIds" },
+        { status: 400 }
+      )
+    }
 
-		if (!categoryId) {
-			return new NextResponse("Category id is required", { status: 400 });
-		}
+    const stock = parseWritableStockQuantity(rawQuantity)
+    if (!stock.ok) {
+      return NextResponse.json(
+        { message: stock.message, field: "quantity" },
+        { status: 400 }
+      )
+    }
 
-		if (!subcategoryId) {
-			return new NextResponse("Category id is required", { status: 400 });
-		}
+    const manualVariants: ManualVariantBody[] = []
+    for (const variant of (productVariant || []) as ManualVariantBody[]) {
+      const vStock = parseWritableStockQuantity(variant.quantity)
+      if (!vStock.ok) {
+        return NextResponse.json(
+          { message: vStock.message, field: "productVariant.quantity" },
+          { status: 400 }
+        )
+      }
+      manualVariants.push({ ...variant, quantity: vStock.quantity })
+    }
 
-		if (!colorId) {
-			return new NextResponse("Color id is required", { status: 400 });
-		}
+    const resolvedVariants = buildSizeVariants({
+      sizeIds: sizes.sizeIds,
+      colorId,
+      price: Number(price),
+      discountedPrice:
+        discountedPrice != null ? Number(discountedPrice) : undefined,
+      quantity: stock.quantity,
+      images,
+      manualVariants: manualVariants.map((variant) => ({
+        colorId: variant.colorId,
+        sizeId: variant.sizeId,
+        quantity: variant.quantity ?? null,
+        price: Number(variant.price),
+        discountedPrice:
+          variant.discountedPrice != null
+            ? Number(variant.discountedPrice)
+            : undefined,
+        images: variant.images || [],
+      })),
+    })
 
-		if (!sizeId) {
-			return new NextResponse("Size id is required", { status: 400 });
-		}
+    const createdProducts = await prismadb.$transaction(async (tx) => {
+      const productCreated = await tx.product.create({
+        data: {
+          name,
+          slug,
+          description,
+          price,
+          discountedPrice,
+          quantity: stock.quantity,
+          isFeatured,
+          isArchived,
+          categoryId,
+          subcategoryId,
+          colorId,
+          sizeId: sizes.sizeId,
+          storeId: auth.store.id,
+          images: {
+            createMany: {
+              data: images.map((image: { url: string }) => ({
+                url: image.url,
+              })),
+            },
+          },
+        },
+      })
 
-		if (!params.storeId) {
-			return new NextResponse("Store id is required", { status: 400 });
-		}
+      const productVariantCreated = await Promise.all(
+        resolvedVariants.map(async (variant) => {
+          return tx.productVariant.create({
+            data: {
+              productId: productCreated.id,
+              colorId: variant.colorId,
+              sizeId: variant.sizeId,
+              quantity: variant.quantity,
+              price: variant.price,
+              discountedPrice: variant.discountedPrice,
+              images: {
+                createMany: {
+                  data: (variant.images || []).map((image) => ({
+                    url: image.url,
+                    productId: productCreated.id,
+                  })),
+                },
+              },
+            },
+          })
+        })
+      )
 
-		// const storeByUserId = await prismadb.store.findFirst({
-		//   where: {
-		//     id: params.storeId,
-		//     userId
-		//   }
-		// });
+      return [productCreated, ...productVariantCreated]
+    })
 
-		// if (!storeByUserId) {
-		//   return new NextResponse("Unauthorized", { status: 405 });
-		// }
-		// const product =  await prismadb.$transaction(async (tx) => {
-		//     const product = await tx.product.create({
-		//       data: {
-		//         name,
-		//         price,
-		//         discountedPrice,
-		//         isFeatured,
-		//         isArchived,
-		//         categoryId,
-		//         subcategoryId,
-		//         colorId,
-		//         sizeId,
-		//         storeId: params.storeId,
-		//       },
-		//     });
-
-		//     // Create product images
-		//     const productImages = images.map((image: { url: string }) => ({
-		//       url: image.url,
-		//       product: { connect: { id: product.id } },
-		//     }));
-
-		//     await tx.image.createMany({
-		//       data: productImages,
-		//     });
-
-		//     // Create product variants without images
-		//     const productVariants = productVariant.map((variant:TProductVariantSchema) => ({
-		//       colorId: variant.colorId,
-		//       sizeId: variant.sizeId,
-		//       quantity: variant.quantity,
-		//       price: variant.price,
-		//       discountedPrice: variant.discountedPrice,
-
-		//       product: { connect: { id: product.id } },
-		//     }));
-
-		//     await tx.productVariant.createMany({
-		//       data: productVariants,
-		//     });
-
-		//     // Create product variant images separately
-		//     const variantImages = productVariant.map((variant:TProductVariantSchema) => ({
-		//       url: variant.images.map((urlImage) => urlImage.url),
-		//       productVariant: { connect: { id: variant.id } },
-		//     }));
-
-		//     await tx.image.createMany({
-		//       data: variantImages,
-		//     });
-		//   });
-		//WORKING
-		// const productCreated = prismadb.product.create({
-		//   data: {
-		//     name,
-		//     price,
-		//     discountedPrice,
-		//     isFeatured,
-		//     isArchived,
-		//     categoryId,
-		//     subcategoryId,
-		//     colorId,
-		//     sizeId,
-		//     storeId: params.storeId,
-		//     images: {
-		//       createMany: {
-		//         data: [
-		//           ...images.map((image: { url: string }) => ({
-		//             url: image.url,
-		//           })),
-		//         ],
-		//       },
-		//     },
-
-		//   },
-		// });
-		//   const productVariantCreated = prismadb.productVariant.create({
-		//     data: productVariant.map((variant: TProductVariantSchema) => ({
-		//       productId: productCreated.id,
-		//       colorId: variant.colorId,
-		//       sizeId: variant.sizeId,
-		//       quantity: variant.quantity,
-		//       price: variant.price,
-		//       discountedPrice: variant.discountedPrice,
-		//       images: {
-		//         createMany: {
-		//           data: [...variant.images.map((image: { url: string }) => ({
-		//             url: image.url,
-		//           }))],
-		//         },
-		//       },
-		//     })),
-		//   })
-		//  const allProducts = await prismadb.$transaction([productCreated,productVariantCreated])
-
-		//   const createdProducts = await prismadb.$transaction(async (tx) => {
-
-		//   const productCreated = await tx.product.create({
-		//     data: {
-		//       name,
-		//       price,
-		//       discountedPrice,
-		//       isFeatured,
-		//       isArchived,
-		//       categoryId,
-		//       subcategoryId,
-		//       colorId,
-		//       sizeId,
-		//       storeId: params.storeId,
-		//       images: {
-		//         createMany: {
-		//           data: [
-		//             ...images.map((image: { url: string }) => ({
-		//               url: image.url,
-		//             })),
-		//           ],
-		//         },
-		//       },
-		//     },
-		//   });
-
-		//   const productVariantCreated = await Promise.all(
-		//     productVariant.map(async (variant: TProductVariantSchema) => {
-		//       const createdVariant = await tx.productVariant.create({
-		//         data: {
-		//           productId: productCreated.id,
-		//           colorId: variant.colorId,
-		//           sizeId: variant.sizeId,
-		//           quantity: variant.quantity,
-		//           price: variant.price,
-		//           discountedPrice: variant.discountedPrice,
-		//           images: {
-		//             createMany: {
-		//               data: [...variant.images.map((image: { url: string }) => ({
-		//                 url: image.url,
-		//                 productId: productCreated.id,
-		//               }))],
-		//             },
-		//           },
-		//         },
-		//       });
-
-		//       return createdVariant;
-		//     })
-		//   );
-
-		//   return [productCreated, ...productVariantCreated];
-		// },
-		const createdProducts = await prismadb.$transaction(async (tx) => {
-			const productData = {
-				name,
-				slug,
-				description,
-				price,
-				discountedPrice,
-				isFeatured,
-				isArchived,
-				categoryId,
-				subcategoryId,
-				colorId,
-				sizeId,
-				storeId: params.storeId,
-				images: {
-					createMany: {
-						data: [
-							...images.map((image: { url: string }) => ({
-								url: image.url,
-							})),
-						],
-					},
-				},
-			};
-
-			// Check if productVariant is present before including it in the data object
-			// if (productVariant && productVariant.length > 0) {
-			//   productData.productVariant = {
-			//     createMany: {
-			//       data: productVariant.map((variant: TProductVariantSchema) => ({
-			//         colorId: variant.colorId,
-			//         sizeId: variant.sizeId,
-			//         quantity: variant.quantity,
-			//         price: variant.price,
-			//         discountedPrice: variant.discountedPrice,
-			//         images: {
-			//           createMany: {
-			//             data: variant.images.map((image: { url: string }) => ({
-			//               url: image.url,
-			//               productId: productCreated.id,
-			//             })),
-			//           },
-			//         },
-			//       })),
-			//     },
-			//   };
-			// }
-
-			const productCreated = await tx.product.create({
-				data: productData,
-			});
-
-			const productVariantCreated = await Promise.all(
-				(productVariant || []).map(async (variant: TProductVariantSchema) => {
-					const createdVariant = await tx.productVariant.create({
-						data: {
-							productId: productCreated.id,
-							colorId: variant.colorId,
-							sizeId: variant.sizeId,
-							quantity: variant.quantity,
-							price: variant.price,
-							discountedPrice: variant.discountedPrice,
-							images: {
-								createMany: {
-									data: (variant.images || []).map(
-										(image: { url: string }) => ({
-											url: image.url,
-											productId: productCreated.id,
-										})
-									),
-								},
-							},
-						},
-					});
-
-					return createdVariant;
-				})
-			);
-
-			return [productCreated, ...productVariantCreated];
-		});
-
-		// 'createdProducts' contains the results of the transaction
-
-		console.log(createdProducts);
-		return NextResponse.json(createdProducts);
-	} catch (error) {
-		console.log("[PRODUCTS_POST]", error);
-		return new NextResponse("Internal error", { status: 500 });
-	}
+    return NextResponse.json(createdProducts)
+  } catch (error) {
+    console.log("[PRODUCTS_POST]", error)
+    if (isSlugUniqueViolation(error)) {
+      return slugConflictResponse()
+    }
+    return new NextResponse("Internal error", { status: 500 })
+  }
 }
 
 export async function GET(
-	req: Request,
-	{ params: rawParams }: { params: Promise<{ storeId: string }> }
+  req: Request,
+  { params: rawParams }: { params: Promise<{ storeId: string }> }
 ) {
-	try {
-		const params = await rawParams;
-		const { searchParams } = new URL(req.url);
-		const categoryId = searchParams.get("categoryId") || undefined;
-		const colorId = searchParams.get("colorId") || undefined;
-		const sizeId = searchParams.get("sizeId") || undefined;
-		const isFeatured = searchParams.get("isFeatured");
+  try {
+    const params = await rawParams
+    const auth = await requireOwnedStoreById(params.storeId)
+    if (auth.error) return auth.error
 
-		if (!params.storeId) {
-			return new NextResponse("Store id is required", { status: 400 });
-		}
+    const { searchParams } = new URL(req.url)
+    const categoryId = searchParams.get("categoryId") || undefined
+    const colorId = searchParams.get("colorId") || undefined
+    const sizeId = searchParams.get("sizeId") || undefined
+    const isFeatured = searchParams.get("isFeatured")
 
-		const products = await prismadb.product.findMany({
-			where: {
-				storeId: params.storeId,
-				categoryId,
-				colorId,
-				sizeId,
-				isFeatured: isFeatured ? true : undefined,
-				isArchived: false,
-			},
-			include: {
-				images: true,
-				category: true,
-				color: true,
-				size: true,
-				productVariant: true,
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+    const products = await prismadb.product.findMany({
+      where: {
+        storeId: auth.store.id,
+        categoryId,
+        colorId,
+        sizeId,
+        isFeatured: isFeatured ? true : undefined,
+        isArchived: false,
+      },
+      include: {
+        images: {
+          where: { productVariantId: null },
+          orderBy: { createdAt: "asc" },
+        },
+        category: true,
+        color: true,
+        size: true,
+        productVariant: {
+          include: {
+            size: true,
+            color: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    })
 
-		return NextResponse.json(products);
-	} catch (error) {
-		console.log("[PRODUCTS_GET]", error);
-		return new NextResponse("Internal error", { status: 500 });
-	}
+    return NextResponse.json(products)
+  } catch (error) {
+    console.log("[PRODUCTS_GET]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
 }

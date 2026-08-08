@@ -1,13 +1,17 @@
 import prismadb from "@/lib/prismadb"
+import { requireOwnedStoreForBusiness, jsonError } from "@/lib/store-access"
+import {
+  isValidStoreSlug,
+  normalizeStoreSlug,
+} from "@/lib/store-identity"
 import { sanitizeNationalNumber } from "@/lib/store-form"
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import {
+  isValidCurrencyCode,
+  normalizeCurrencyCode,
+} from "@/lib/currency"
 import { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
 import isMobilePhone from "validator/lib/isMobilePhone"
-
-function jsonError(message: string, status: number, field?: string) {
-  return NextResponse.json(field ? { message, field } : { message }, { status })
-}
 
 function requireTrimmed(
   value: unknown,
@@ -54,45 +58,14 @@ type RouteParams = {
   params: Promise<{ businessId: string; storeId: string }>
 }
 
-async function authorizeStore(businessId: string, storeId: string) {
-  const { getUser, isAuthenticated } = getKindeServerSession()
-  const userInfo = await getUser()
-  const userId = userInfo?.id
-  const isAuth = await isAuthenticated()
-
-  if (!isAuth || !userId) {
-    return { error: jsonError("Unauthorized.", 401) }
-  }
-
-  if (!businessId) {
-    return { error: jsonError("Business ID is required.", 400) }
-  }
-
-  if (!storeId) {
-    return { error: jsonError("Store ID is required.", 400) }
-  }
-
-  const store = await prismadb.store.findFirst({
-    where: {
-      id: storeId,
-      userId,
-      businessId,
-    },
-    select: { id: true },
-  })
-
-  if (!store) {
-    return { error: jsonError("Store not found.", 404) }
-  }
-
-  return { userId, store }
-}
-
 export async function PATCH(request: Request, { params: rawParams }: RouteParams) {
   try {
     const params = await rawParams
-    const auth = await authorizeStore(params.businessId, params.storeId)
-    if ("error" in auth && auth.error) return auth.error
+    const auth = await requireOwnedStoreForBusiness(
+      params.businessId,
+      params.storeId
+    )
+    if (auth.error) return auth.error
 
     const body = await request.json()
     const {
@@ -102,17 +75,38 @@ export async function PATCH(request: Request, { params: rawParams }: RouteParams
       storeCity,
       storeCountry,
       storeSlug,
+      currency: rawCurrency,
     } = body
 
     const name = requireTrimmed(storeName, "Store name is required.", "storeName")
     if (name instanceof NextResponse) return name
 
-    const slug = requireTrimmed(
+    const rawSlug = requireTrimmed(
       storeSlug,
       "Store slug is required. Try a different store name.",
       "storeSlug"
     )
-    if (slug instanceof NextResponse) return slug
+    if (rawSlug instanceof NextResponse) return rawSlug
+
+    const slug = normalizeStoreSlug(rawSlug)
+    if (!isValidStoreSlug(slug)) {
+      return jsonError(
+        "Store slug is invalid or reserved. Use lowercase letters, numbers, and underscores.",
+        400,
+        "storeSlug"
+      )
+    }
+
+    if (
+      auth.store.status === "PUBLISHED" &&
+      slug !== auth.store.storeSlug
+    ) {
+      return jsonError(
+        "Public URL cannot be changed while the store is live. Take the store offline first.",
+        400,
+        "storeSlug"
+      )
+    }
 
     const rawPhone = requireTrimmed(
       storePhoneNumber,
@@ -142,6 +136,14 @@ export async function PATCH(request: Request, { params: rawParams }: RouteParams
       "storeCountry"
     )
     if (country instanceof NextResponse) return country
+
+    let currency = auth.store.currency || "NGN"
+    if (rawCurrency != null && rawCurrency !== "") {
+      if (typeof rawCurrency !== "string" || !isValidCurrencyCode(rawCurrency)) {
+        return jsonError("Select a valid ISO currency code.", 400, "currency")
+      }
+      currency = normalizeCurrencyCode(rawCurrency)
+    }
 
     const [existingPhone, existingSlug] = await Promise.all([
       prismadb.store.findFirst({
@@ -184,6 +186,7 @@ export async function PATCH(request: Request, { params: rawParams }: RouteParams
         address,
         city,
         country,
+        currency,
       },
     })
 
@@ -208,8 +211,11 @@ export async function DELETE(
 ) {
   try {
     const params = await rawParams
-    const auth = await authorizeStore(params.businessId, params.storeId)
-    if ("error" in auth && auth.error) return auth.error
+    const auth = await requireOwnedStoreForBusiness(
+      params.businessId,
+      params.storeId
+    )
+    if (auth.error) return auth.error
 
     const store = await prismadb.store.delete({
       where: { id: params.storeId },

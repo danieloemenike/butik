@@ -156,11 +156,22 @@
 
   .landing-hero-veil {
     background: linear-gradient(
-      to right,
+      to bottom,
       var(--landing-overlay) 0%,
-      var(--landing-overlay-mid) 48%,
-      transparent 100%
+      var(--landing-overlay-mid) 42%,
+      transparent 78%
     );
+  }
+
+  @media (min-width: 1024px) {
+    .landing-hero-veil {
+      background: linear-gradient(
+        to right,
+        var(--landing-overlay) 0%,
+        var(--landing-overlay-mid) 48%,
+        transparent 100%
+      );
+    }
   }
 
   .landing-grain {
