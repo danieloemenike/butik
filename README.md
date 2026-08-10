@@ -179,6 +179,6 @@ Deploy like any Next.js App Router app (Vercel, Railway, etc.):
 4. Build and start (`npm run build` → `npm run start`), or use the platform’s Next.js adapter
 5. Align Kinde redirect URLs with the production origin
 
-## License
+This repository is the open-source / portfolio edition of UseButik, a multi-tenant commerce platform.
 
-Private project (`"private": true` in `package.json`).
+Licensed under the MIT License. 
