@@ -182,3 +182,4 @@ Deploy like any Next.js App Router app (Vercel, Railway, etc.):
 This repository is the open-source / portfolio edition of UseButik, a multi-tenant commerce platform.
 
 Licensed under the MIT License. 
+See [LICENSE](./LICENSE) for details.
